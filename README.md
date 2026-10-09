@@ -1,5 +1,7 @@
 # Beutl.Extensions.Karaoke
 
+<img src="assets/icon.png" width="96" height="96" alt="">
+
 歌詞を表示し、歌った部分から左へ順に色を変えるカラオケ字幕のBeutl拡張機能です。歌詞はツールタブで取り込み・編集・タイミング付けをして、要素の中に保存します。
 
 ## 使い方

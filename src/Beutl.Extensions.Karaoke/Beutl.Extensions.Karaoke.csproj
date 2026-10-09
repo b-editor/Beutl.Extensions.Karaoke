@@ -9,6 +9,7 @@
         <AssemblyVersion>0.1.0.0</AssemblyVersion>
         <Authors>Yuto Terada</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>icon.png</PackageIcon>
         <BeutlAutoReferenceSourceGenerators>false</BeutlAutoReferenceSourceGenerators>
     </PropertyGroup>
 
@@ -35,4 +36,7 @@
         <PackageReference Include="FluentIcons.Resources.Avalonia" Version="2.1.343" ExcludeAssets="runtime;native" PrivateAssets="all" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="..\..\assets\icon.png" Pack="true" PackagePath="\" Visible="false" />
+    </ItemGroup>
 </Project>
