@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using Avalonia;
 using Avalonia.Controls;
@@ -18,30 +17,9 @@ public sealed class LyricsPropertyEditorExtension : PropertyEditorExtension
 
     public override string DisplayName => "カラオケ字幕の歌詞";
 
-    public override IEnumerable<IPropertyAdapter> MatchProperty(IReadOnlyList<IPropertyAdapter> properties)
+    protected override void RegisterEditors(PropertyEditorRegistry registry)
     {
-        foreach (IPropertyAdapter property in properties)
-        {
-            if (property.PropertyType == typeof(KaraokeLyrics))
-            {
-                yield return property;
-                yield break;
-            }
-        }
-    }
-
-    public override bool TryCreateContext(IReadOnlyList<IPropertyAdapter> properties, [NotNullWhen(true)] out IPropertyEditorContext? context)
-    {
-        context = properties.Count > 0 && properties[0] is IPropertyAdapter<KaraokeLyrics> adapter
-            ? new Context(this, adapter)
-            : null;
-        return context != null;
-    }
-
-    public override bool TryCreateControl(IPropertyEditorContext context, [NotNullWhen(true)] out Control? control)
-    {
-        control = context is Context c ? new Summary(c) : null;
-        return control != null;
+        registry.Register<KaraokeLyrics, Context>(adapter => new Context(this, adapter), context => new Summary(context));
     }
 
     internal sealed class Context(PropertyEditorExtension extension, IPropertyAdapter<KaraokeLyrics> adapter) : IPropertyEditorContext

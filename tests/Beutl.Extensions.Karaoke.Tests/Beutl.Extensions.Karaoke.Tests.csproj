@@ -11,10 +11,10 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
         <PackageReference Include="NUnit" Version="4.5.1" />
         <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
-        <PackageReference Include="Avalonia.Headless.NUnit" Version="12.1.3" />
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.3" />
+        <PackageReference Include="Avalonia.Headless.NUnit" Version="12.1.4" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.4" />
         <!-- Beutl provides the icons at run time; the tests load them themselves. -->
-        <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="2.1.343" />
+        <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="2.1.344" />
     </ItemGroup>
 
     <ItemGroup>

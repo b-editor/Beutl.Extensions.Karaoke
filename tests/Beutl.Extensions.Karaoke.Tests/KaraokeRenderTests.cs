@@ -16,13 +16,13 @@ public class KaraokeRenderTests
     private static KaraokeDrawable CreateDrawable(string lrc)
     {
         var drawable = new KaraokeDrawable();
-        drawable.Lyrics.CurrentValue = Lyrics(lrc);
-        drawable.Layout.CurrentValue = KaraokeLayout.SingleLine;
-        drawable.FadeDuration.CurrentValue = 0f;
-        drawable.TextFill.CurrentValue = new SolidColorBrush(Colors.White);
-        drawable.SungFill.CurrentValue = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0));
-        drawable.TextStroke.CurrentValue = null;
-        drawable.SungStroke.CurrentValue = null;
+        drawable.Lyrics.Value = Lyrics(lrc);
+        drawable.Layout.Value = KaraokeLayout.SingleLine;
+        drawable.FadeDuration.Value = 0f;
+        drawable.TextFill.Value = new SolidColorBrush(Colors.White);
+        drawable.SungFill.Value = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0));
+        drawable.TextStroke.Value = null;
+        drawable.SungStroke.Value = null;
         return drawable;
     }
 
@@ -60,9 +60,9 @@ public class KaraokeRenderTests
     [Test]
     public void SungPartIsRecoloredFromTheLeft()
     {
-        Scene scene = HeadlessScene.Create((CreateDrawable(Lyric), TimeSpan.FromSeconds(10)));
+        Scene scene = HeadlessScene.Create((CreateDrawable(Lyric), MediaTime.FromSeconds(10)));
 
-        using Bitmap frame = HeadlessScene.Render(scene, TimeSpan.FromSeconds(1.0));
+        using Bitmap frame = HeadlessScene.Render(scene, MediaTime.FromSeconds(1.0));
         HeadlessScene.SaveForInspection(frame, "karaoke-half.png");
         var result = Analyze(frame);
 
@@ -77,10 +77,10 @@ public class KaraokeRenderTests
     [Test]
     public void LineIsUnsungBeforeItStartsAndFullySungAtItsEnd()
     {
-        Scene scene = HeadlessScene.Create((CreateDrawable(Lyric), TimeSpan.FromSeconds(10)));
+        Scene scene = HeadlessScene.Create((CreateDrawable(Lyric), MediaTime.FromSeconds(10)));
 
-        using Bitmap before = HeadlessScene.Render(scene, TimeSpan.FromSeconds(-0.0));
-        using Bitmap after = HeadlessScene.Render(scene, TimeSpan.FromSeconds(2.5));
+        using Bitmap before = HeadlessScene.Render(scene, MediaTime.FromSeconds(-0.0));
+        using Bitmap after = HeadlessScene.Render(scene, MediaTime.FromSeconds(2.5));
 
         Assert.That(Analyze(before).Red, Is.Zero);
         Assert.That(Analyze(before).White, Is.GreaterThan(500));
@@ -91,11 +91,11 @@ public class KaraokeRenderTests
     [Test]
     public void LineDisappearsAfterTheTailAndTheNextLineAppears()
     {
-        Scene scene = HeadlessScene.Create((CreateDrawable(Lyric), TimeSpan.FromSeconds(10)));
+        Scene scene = HeadlessScene.Create((CreateDrawable(Lyric), MediaTime.FromSeconds(10)));
 
         // The first line is sung by 2 s and stays 0.8 s; the next line may appear 1.5 s before 5 s.
-        using Bitmap gap = HeadlessScene.Render(scene, TimeSpan.FromSeconds(3.2));
-        using Bitmap next = HeadlessScene.Render(scene, TimeSpan.FromSeconds(4.0));
+        using Bitmap gap = HeadlessScene.Render(scene, MediaTime.FromSeconds(3.2));
+        using Bitmap next = HeadlessScene.Render(scene, MediaTime.FromSeconds(4.0));
 
         Assert.That(Analyze(gap).MaxX, Is.EqualTo(-1));
         Assert.That(Analyze(next).White, Is.GreaterThan(200));
@@ -105,11 +105,11 @@ public class KaraokeRenderTests
     public void TwoLineLayoutUsesTwoRows()
     {
         KaraokeDrawable drawable = CreateDrawable("[00:00.00]いちぎょうめ\n[00:01.00]にぎょうめ\n[00:03.00]");
-        drawable.Layout.CurrentValue = KaraokeLayout.TwoLines;
-        drawable.LeadTime.CurrentValue = 2f;
-        Scene scene = HeadlessScene.Create((drawable, TimeSpan.FromSeconds(10)));
+        drawable.Layout.Value = KaraokeLayout.TwoLines;
+        drawable.LeadTime.Value = 2f;
+        Scene scene = HeadlessScene.Create((drawable, MediaTime.FromSeconds(10)));
 
-        using Bitmap frame = HeadlessScene.Render(scene, TimeSpan.FromSeconds(0.5));
+        using Bitmap frame = HeadlessScene.Render(scene, MediaTime.FromSeconds(0.5));
         HeadlessScene.SaveForInspection(frame, "karaoke-two-lines.png");
 
         // Collect the rows that contain text; two separated bands are expected.
@@ -124,11 +124,11 @@ public class KaraokeRenderTests
     public void DefaultStyleDrawsBothOutlines()
     {
         var drawable = new KaraokeDrawable();
-        drawable.Lyrics.CurrentValue = Lyrics(Lyric);
-        drawable.Layout.CurrentValue = KaraokeLayout.SingleLine;
-        Scene scene = HeadlessScene.Create((drawable, TimeSpan.FromSeconds(10)));
+        drawable.Lyrics.Value = Lyrics(Lyric);
+        drawable.Layout.Value = KaraokeLayout.SingleLine;
+        Scene scene = HeadlessScene.Create((drawable, MediaTime.FromSeconds(10)));
 
-        using Bitmap frame = HeadlessScene.Render(scene, TimeSpan.FromSeconds(1.0));
+        using Bitmap frame = HeadlessScene.Render(scene, MediaTime.FromSeconds(1.0));
         HeadlessScene.SaveForInspection(frame, "karaoke-default-style.png");
 
         int navyOutline = 0, sungFill = 0;
@@ -153,43 +153,45 @@ public class KaraokeRenderTests
     [Test]
     public void SurvivesSerializationRoundTrip()
     {
-        var element = new Element { Length = TimeSpan.FromSeconds(5) };
+        var element = new Element { Length = { Value = MediaTime.FromSeconds(5) } };
         KaraokeDrawable original = CreateDrawable(Lyric);
-        original.FontSize.CurrentValue = 96f;
+        original.FontSize.Value = 96f;
         element.AddObject(original);
 
         JsonObject json = CoreSerializer.SerializeToJsonObject(element);
         var restored = (KaraokeDrawable)((Element)CoreSerializer.DeserializeFromJsonObject(json, typeof(Element))).Objects.Single();
 
-        Assert.That(restored.Lyrics.CurrentValue, Is.EqualTo(original.Lyrics.CurrentValue));
-        Assert.That(restored.Lyrics.CurrentValue.Lines.Any(l => l.HasWordTiming), Is.True);
-        Assert.That(restored.FontSize.CurrentValue, Is.EqualTo(96f));
-        Assert.That(restored.Layout.CurrentValue, Is.EqualTo(KaraokeLayout.SingleLine));
+        Assert.That(restored.Lyrics.Value, Is.EqualTo(original.Lyrics.Value));
+        Assert.That(restored.Lyrics.Value.Lines.Any(l => l.HasWordTiming), Is.True);
+        Assert.That(restored.FontSize.Value, Is.EqualTo(96f));
+        Assert.That(restored.Layout.Value, Is.EqualTo(KaraokeLayout.SingleLine));
     }
 
-    [Test]
-    public void TheBackHalfOfASplitShowsWhatTheWholeElementShowed()
+    [TestCase(30, 1)]
+    [TestCase(30000, 1001)]
+    public void TheBackHalfOfASplitShowsWhatTheWholeElementShowed(int numerator, int denominator)
     {
-        Scene whole = HeadlessScene.Create((CreateDrawable(Lyric), TimeSpan.FromSeconds(10)));
-        Scene split = HeadlessScene.Create((CreateDrawable(Lyric), TimeSpan.FromSeconds(10)));
+        MediaTime at = MediaTime.FromFrames(37, new Rational(numerator, denominator));
+        Scene whole = HeadlessScene.Create((CreateDrawable(Lyric), MediaTime.FromSeconds(10)));
+        Scene split = HeadlessScene.Create((CreateDrawable(Lyric), MediaTime.FromSeconds(10)));
         Element front = split.Children[0];
-        Element back = HeadlessScene.Split(split, front, TimeSpan.FromSeconds(1.5));
+        Element back = HeadlessScene.Split(split, front, at);
 
         var backDrawable = back.Objects.OfType<KaraokeDrawable>().Single();
-        Assert.That(backDrawable.TimeOffset.CurrentValue, Is.EqualTo(TimeSpan.FromSeconds(-1.5)));
-        Assert.That(front.Objects.OfType<KaraokeDrawable>().Single().TimeOffset.CurrentValue, Is.EqualTo(TimeSpan.Zero));
-        Assert.That(backDrawable.Lyrics.CurrentValue.Count, Is.EqualTo(2), "Both halves keep every line.");
+        Assert.That(backDrawable.TimeOffset.Value, Is.EqualTo(-at));
+        Assert.That(front.Objects.OfType<KaraokeDrawable>().Single().TimeOffset.Value, Is.EqualTo(MediaTime.Zero));
+        Assert.That(backDrawable.Lyrics.Value.Count, Is.EqualTo(2), "Both halves keep every line.");
 
         // Fitting the back half to its content still ends where the lyrics end.
-        whole.Children[0].Objects.OfType<KaraokeDrawable>().Single().TryGetOriginalDuration(out TimeSpan wholeDuration);
-        Assert.That(backDrawable.TryGetOriginalDuration(out TimeSpan backDuration), Is.True);
-        Assert.That(backDuration, Is.EqualTo(wholeDuration - TimeSpan.FromSeconds(1.5)));
+        whole.Children[0].Objects.OfType<KaraokeDrawable>().Single().TryGetOriginalDuration(out MediaTime wholeDuration);
+        Assert.That(backDrawable.TryGetOriginalDuration(out MediaTime backDuration), Is.True);
+        Assert.That(backDuration, Is.EqualTo(wholeDuration - at));
 
         // The cut falls in the middle of the first line, which carries on colouring; then the next line shows.
-        foreach (double seconds in new[] { 1.5, 1.75, 5.5 })
+        foreach (MediaTime time in new[] { at, at + MediaTime.FromSeconds(0.25), MediaTime.FromSeconds(5.5) })
         {
-            using Bitmap expected = HeadlessScene.Render(whole, TimeSpan.FromSeconds(seconds));
-            using Bitmap actual = HeadlessScene.Render(split, TimeSpan.FromSeconds(seconds));
+            using Bitmap expected = HeadlessScene.Render(whole, time);
+            using Bitmap actual = HeadlessScene.Render(split, time);
             HeadlessScene.AssertSameFrame(expected, actual);
         }
     }
