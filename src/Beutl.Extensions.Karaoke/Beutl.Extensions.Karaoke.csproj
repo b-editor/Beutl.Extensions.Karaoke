@@ -5,8 +5,8 @@
         <Title>カラオケ字幕</Title>
         <Description>LRCファイルを読み込み、歌詞の色が単語ごとに塗り替わるカラオケ風の字幕を生成します</Description>
         <PackageTags>caption,lyrics,karaoke,lrc,歌詞,カラオケ</PackageTags>
-        <Version>0.1.0</Version>
-        <AssemblyVersion>0.1.0.0</AssemblyVersion>
+        <Version>0.1.1</Version>
+        <AssemblyVersion>0.1.1.0</AssemblyVersion>
         <Authors>Yuto Terada</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>icon.png</PackageIcon>
