@@ -1,5 +1,8 @@
 using System.Reactive;
 using System.Reactive.Linq;
+using Avalonia.Controls;
+using Avalonia.Platform.Storage;
+using Beutl.Collections;
 using Beutl.Editor;
 using Beutl.Editor.Observers;
 using Beutl.Editor.Services;
@@ -10,6 +13,7 @@ using Beutl.Extensions.Karaoke.Graphics;
 using Beutl.Media;
 using Beutl.Media.Source;
 using Beutl.ProjectSystem;
+using FluentAvalonia.UI.Controls;
 using Reactive.Bindings;
 
 namespace Beutl.Extensions.Karaoke.Tests;
@@ -28,15 +32,15 @@ internal sealed class EditorFixture : IDisposable
     {
         Scene = new Scene(1920, 1080, "Fixture");
         Drawable = new KaraokeDrawable();
-        Drawable.Lyrics.CurrentValue = new KaraokeLyrics(LrcParser.Parse(lyrics).Lines);
-        Element = new Element { Start = TimeSpan.FromSeconds(1), Length = TimeSpan.FromSeconds(10), ZIndex = 2 };
+        Drawable.Lyrics.Value = new KaraokeLyrics(LrcParser.Parse(lyrics).Lines);
+        Element = new Element { Start = { Value = MediaTime.FromSeconds(1) }, Length = { Value = MediaTime.FromSeconds(10) }, ZIndex = { Value = 2 } };
         Element.AddObject(Drawable);
         Scene.AddChild(Element);
 
         // Wired like the editor's EditViewModel: the observer reports changes in the scene to the history.
         var sequence = new OperationSequenceGenerator();
         _observer = new CoreObjectOperationObserver(null, Scene, sequence);
-        History = new HistoryManager(Scene, sequence);
+        History = new HistoryManager(sequence);
         _historySubscription = History.Subscribe(_observer);
         _services[typeof(IEditorSelection)] = Selection;
         _services[typeof(IEditorClock)] = Clock;
@@ -77,16 +81,16 @@ internal sealed class EditorFixture : IDisposable
     public KaraokeDrawable AddKaraoke(string lyrics, TimeSpan start)
     {
         var drawable = new KaraokeDrawable();
-        drawable.Lyrics.CurrentValue = new KaraokeLyrics(LrcParser.Parse(lyrics).Lines);
-        var element = new Element { Start = start, Length = TimeSpan.FromSeconds(10), ZIndex = 5 };
+        drawable.Lyrics.Value = new KaraokeLyrics(LrcParser.Parse(lyrics).Lines);
+        var element = new Element { Start = { Value = MediaTime.FromTimeSpan(start) }, Length = { Value = MediaTime.FromSeconds(10) }, ZIndex = { Value = 5 } };
         element.AddObject(drawable);
         Scene.AddChild(element);
         return drawable;
     }
 
-    public string[] Texts => Drawable.Lyrics.CurrentValue.Lines.Select(l => l.Text).ToArray();
+    public string[] Texts => Drawable.Lyrics.Value.Lines.Select(l => l.Text).ToArray();
 
-    public IReadOnlyList<LyricLine> Lines => Drawable.Lyrics.CurrentValue.Lines;
+    public IReadOnlyList<LyricLine> Lines => Drawable.Lyrics.Value.Lines;
 
     public object? GetService(Type type) => _services.GetValueOrDefault(type);
 
@@ -101,16 +105,34 @@ internal sealed class EditorFixture : IDisposable
 
 internal sealed class FakeSelection : IEditorSelection
 {
-    public IReactiveProperty<CoreObject?> SelectedObject { get; } = new ReactivePropertySlim<CoreObject?>();
+    private readonly ReactivePropertySlim<CoreObject?> _selectedObject = new();
+
+    public IReadOnlyReactiveProperty<CoreObject?> SelectedObject => _selectedObject;
 
     public IReadOnlyReactiveProperty<int?> SelectedLayerNumber { get; } = new ReactivePropertySlim<int?>();
+
+    public ICoreList<Element> SelectedElements { get; } = new CoreList<Element>();
+
+    public void Select(CoreObject? obj, bool notifyIfSelected = false)
+    {
+        _selectedObject.Value = obj;
+        if (notifyIfSelected)
+            _selectedObject.ForceNotify();
+        SelectedElements.Clear();
+        if ((obj as Element ?? (obj as IHierarchical)?.FindHierarchicalParent<Element>()) is { } element)
+            SelectedElements.Add(element);
+    }
 }
 
 internal sealed class FakeClock : IEditorClock
 {
-    public IReactiveProperty<TimeSpan> CurrentTime { get; } = new ReactivePropertySlim<TimeSpan>();
+    private readonly ReactivePropertySlim<MediaTime> _currentTime = new();
 
-    public IReadOnlyReactiveProperty<TimeSpan> MaximumTime { get; } = new ReactivePropertySlim<TimeSpan>(TimeSpan.FromMinutes(5));
+    public IReadOnlyReactiveProperty<MediaTime> CurrentTime => _currentTime;
+
+    public IReadOnlyReactiveProperty<MediaTime> MaximumTime { get; } = new ReactivePropertySlim<MediaTime>(MediaTime.FromSeconds(300));
+
+    public void Seek(MediaTime time) => _currentTime.Value = time;
 }
 
 /// <summary>A clock that only moves when the test says so.</summary>
@@ -146,15 +168,15 @@ internal sealed class FakePlayer : IPreviewPlayer
     }
 }
 
-internal sealed class FakeEditorContext(CoreObject obj, EditorFixture fixture) : IEditorContext, IContextCommandHandler
+internal sealed class FakeEditorContext(CoreObject obj, EditorFixture fixture) : IEditorContext
 {
     /// <summary>The commands the tab asked the editor to run, in order.</summary>
     public List<string> Commands { get; } = [];
 
     public Task ExecuteAsync(ContextCommandExecution execution)
     {
-        Commands.Add(execution.CommandName);
-        if (execution.CommandName == "PlayPause" && fixture.Player is { } player)
+        Commands.Add(execution.CommandId);
+        if (execution.CommandId == "editor.playPause" && fixture.Player is { } player)
         {
             if (player.Playing.Value)
                 return player.Pause();
@@ -166,7 +188,7 @@ internal sealed class FakeEditorContext(CoreObject obj, EditorFixture fixture) :
 
     public CoreObject Object => obj;
 
-    public EditorExtension Extension => throw new NotSupportedException();
+    public EditorExtension Extension { get; } = new FakeEditorExtension();
 
     public IReactiveProperty<bool> IsEnabled { get; } = new ReactivePropertySlim<bool>(true);
 
@@ -191,4 +213,29 @@ internal sealed class FakeEditorContext(CoreObject obj, EditorFixture fixture) :
     {
         OpenRequests.RemoveAll(t => ReferenceEquals(t, item));
     }
+}
+
+internal sealed class FakeEditorExtension : EditorExtension
+{
+    public override string Name => "Test editor";
+
+    public override string DisplayName => Name;
+
+    public override IEnumerable<ContextCommandDefinition> ContextCommands =>
+    [
+        new ContextCommandDefinition<FakeEditorContext>("editor.playPause")
+        {
+            ExecuteOnAsync = (editor, execution) => editor.ExecuteAsync(execution)
+        }
+    ];
+
+    public override FilePickerFileType GetFilePickerFileType() => throw new NotSupportedException();
+
+    public override FAIconSource? GetIcon() => null;
+
+    public override bool TryCreateEditor(CoreObject obj, out Control editor) => throw new NotSupportedException();
+
+    public override bool TryCreateContext(CoreObject obj, IEditorContextServices services, out IEditorContext context) => throw new NotSupportedException();
+
+    public override bool MatchFileExtension(string ext) => false;
 }

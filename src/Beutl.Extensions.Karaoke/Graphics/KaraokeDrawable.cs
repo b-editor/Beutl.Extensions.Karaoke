@@ -21,57 +21,57 @@ public sealed partial class KaraokeDrawable : Drawable, IOriginalDurationProvide
     {
         ScanProperties<KaraokeDrawable>();
 
-        TextFill.CurrentValue = new SolidColorBrush(Colors.White);
-        TextStroke.CurrentValue = CreatePen(Color.FromArgb(255, 0x10, 0x20, 0x60), 8);
-        SungFill.CurrentValue = new SolidColorBrush(Color.FromArgb(255, 0x2E, 0x8B, 0xFF));
-        SungStroke.CurrentValue = CreatePen(Colors.White, 8);
+        TextFill.Value = new SolidColorBrush(Colors.White);
+        TextStroke.Value = CreatePen(Color.FromArgb(255, 0x10, 0x20, 0x60), 8);
+        SungFill.Value = new SolidColorBrush(Color.FromArgb(255, 0x2E, 0x8B, 0xFF));
+        SungStroke.Value = CreatePen(Colors.White, 8);
     }
 
     [Display(Name = "歌詞", Description = "ツールタブ「カラオケ字幕」で取り込みや編集ができます")]
-    public IProperty<KaraokeLyrics> Lyrics { get; } = Property.Create(KaraokeLyrics.Empty);
+    public IExpressionProperty<KaraokeLyrics> Lyrics { get; } = Property.CreateExpression(KaraokeLyrics.Empty);
 
     [Display(Name = "表示方法")]
-    public IProperty<KaraokeLayout> Layout { get; } = Property.Create(KaraokeLayout.TwoLines);
+    public IExpressionProperty<KaraokeLayout> Layout { get; } = Property.CreateExpression(KaraokeLayout.TwoLines);
 
     [Display(Name = "フォント")]
-    public IProperty<FontFamily?> FontFamily { get; } = Property.Create<FontFamily?>(DefaultFont());
+    public IExpressionProperty<FontFamily?> FontFamily { get; } = Property.CreateExpression<FontFamily?>(DefaultFont());
 
     [Display(Name = "太さ")]
-    public IProperty<FontWeight> FontWeight { get; } = Property.Create(Media.FontWeight.Bold);
+    public IExpressionProperty<FontWeight> FontWeight { get; } = Property.CreateExpression(Media.FontWeight.Bold);
 
     [Range(1f, 1000f)]
     [Display(Name = "文字の大きさ")]
-    public IProperty<float> FontSize { get; } = Property.Create(64f);
+    public IExpressionProperty<float> FontSize { get; } = Property.CreateExpression(64f);
 
     [Display(Name = "行の間隔")]
-    public IProperty<float> LineSpacing { get; } = Property.Create(16f);
+    public IExpressionProperty<float> LineSpacing { get; } = Property.CreateExpression(16f);
 
     [Display(Name = "歌う前の文字の色")]
-    public IProperty<Brush?> TextFill { get; } = Property.Create<Brush?>();
+    public IExpressionProperty<Brush?> TextFill { get; } = Property.CreateExpression<Brush?>();
 
     [Display(Name = "歌う前の縁取り")]
-    public IProperty<Pen?> TextStroke { get; } = Property.Create<Pen?>();
+    public IExpressionProperty<Pen?> TextStroke { get; } = Property.CreateExpression<Pen?>();
 
     [Display(Name = "歌った後の文字の色")]
-    public IProperty<Brush?> SungFill { get; } = Property.Create<Brush?>();
+    public IExpressionProperty<Brush?> SungFill { get; } = Property.CreateExpression<Brush?>();
 
     [Display(Name = "歌った後の縁取り")]
-    public IProperty<Pen?> SungStroke { get; } = Property.Create<Pen?>();
+    public IExpressionProperty<Pen?> SungStroke { get; } = Property.CreateExpression<Pen?>();
 
     [Range(0f, 10f)]
     [Display(Name = "先に表示する時間 (秒)", Description = "歌い始めるこの時間前から行を表示します")]
-    public IProperty<float> LeadTime { get; } = Property.Create(1.5f);
+    public IExpressionProperty<float> LeadTime { get; } = Property.CreateExpression(1.5f);
 
     [Range(0f, 10f)]
     [Display(Name = "残す時間 (秒)", Description = "歌い終わってからこの時間だけ行を残します")]
-    public IProperty<float> TailTime { get; } = Property.Create(0.8f);
+    public IExpressionProperty<float> TailTime { get; } = Property.CreateExpression(0.8f);
 
     [Range(0f, 2f)]
     [Display(Name = "フェードの長さ (秒)")]
-    public IProperty<float> FadeDuration { get; } = Property.Create(0.2f);
+    public IExpressionProperty<float> FadeDuration { get; } = Property.CreateExpression(0.2f);
 
     [Display(Name = "時刻のずれ", Description = "歌詞の時刻にこの時間を足して表示します")]
-    public IProperty<TimeSpan> TimeOffset { get; } = Property.Create(TimeSpan.Zero);
+    public IExpressionProperty<MediaTime> TimeOffset { get; } = Property.CreateExpression(MediaTime.Zero);
 
     private static FontFamily DefaultFont()
     {
@@ -82,39 +82,39 @@ public sealed partial class KaraokeDrawable : Drawable, IOriginalDurationProvide
     private static Pen CreatePen(Color color, float thickness)
     {
         var pen = new Pen();
-        pen.Brush.CurrentValue = new SolidColorBrush(color);
-        pen.Thickness.CurrentValue = thickness;
-        pen.StrokeJoin.CurrentValue = StrokeJoin.Round;
-        pen.StrokeAlignment.CurrentValue = StrokeAlignment.Outside;
+        pen.Brush.Value = new SolidColorBrush(color);
+        pen.Thickness.Value = thickness;
+        pen.StrokeJoin.Value = StrokeJoin.Round;
+        pen.StrokeAlignment.Value = StrokeAlignment.Outside;
         return pen;
     }
 
     public bool HasOriginalDuration()
     {
-        return Lyrics.CurrentValue.Count > 0;
+        return Lyrics.Value.Count > 0;
     }
 
-    public bool TryGetOriginalDuration(out TimeSpan timeSpan)
+    public bool TryGetOriginalDuration(out MediaTime timeSpan)
     {
-        timeSpan = TimeSpan.Zero;
-        KaraokeLyrics lyrics = Lyrics.CurrentValue;
+        timeSpan = MediaTime.Zero;
+        KaraokeLyrics lyrics = Lyrics.Value;
         if (lyrics.Count == 0)
             return false;
 
-        LineSchedule[] schedule = KaraokeTimeline.Schedule(lyrics.Lines, Layout.CurrentValue,
-            TimeSpan.FromSeconds(Math.Max(0, LeadTime.CurrentValue)), TimeSpan.FromSeconds(Math.Max(0, TailTime.CurrentValue)));
-        timeSpan = schedule.Max(s => s.Hide) + TimeOffset.CurrentValue;
-        return timeSpan > TimeSpan.Zero;
+        LineSchedule[] schedule = KaraokeTimeline.Schedule(lyrics.Lines, Layout.Value,
+            TimeSpan.FromSeconds(Math.Max(0, LeadTime.Value)), TimeSpan.FromSeconds(Math.Max(0, TailTime.Value)));
+        timeSpan = MediaTime.FromTimeSpan(schedule.Max(s => s.Hide)) + TimeOffset.Value;
+        return timeSpan > MediaTime.Zero;
     }
 
     /// <summary>
     /// Keeps the lyrics where they were when the element is split. The back half starts later, so its lyrics move back
     /// by as much; both halves keep every line, as both halves of a split video keep the whole file.
     /// </summary>
-    public void NotifySplitted(bool backward, TimeSpan startDelta, TimeSpan durationDelta)
+    public void NotifySplitted(bool backward, MediaTime startDelta, MediaTime durationDelta)
     {
         if (backward)
-            TimeOffset.CurrentValue -= startDelta;
+            TimeOffset.Value -= startDelta;
     }
 
     protected override Size MeasureCore(Size availableSize, Drawable.Resource resource)
@@ -194,10 +194,10 @@ public sealed partial class KaraokeDrawable : Drawable, IOriginalDurationProvide
 
         internal LineSchedule[]? Schedule { get; private set; }
 
-        partial void PostUpdate(KaraokeDrawable obj, CompositionContext context)
+        partial void PostReconcile(KaraokeDrawable obj, CompositionContext context)
         {
             UpdateDocument();
-            TimeSpan time = context.Time - obj.TimeRange.Start - TimeOffset;
+            TimeSpan time = (context.Time - obj.TimeRange.Value.Start - TimeOffset).ToTimeSpan();
             if (time != LyricTime)
             {
                 LyricTime = time;

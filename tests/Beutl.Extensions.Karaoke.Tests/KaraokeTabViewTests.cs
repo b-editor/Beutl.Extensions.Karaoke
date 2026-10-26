@@ -210,7 +210,7 @@ public class KaraokeTabViewTests
         Find<Button>(view).Single(b => (b.Content as TextBlock)?.Text == "い").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
 
         // い starts at 3.5 s in a lyric that starts with the element at 1 s.
-        Assert.That(f.Clock.CurrentTime.Value, Is.EqualTo(S(4.5)));
+        Assert.That(f.Clock.CurrentTime.Value, Is.EqualTo(MediaTime.FromSeconds(4.5)));
     }
 
     [AvaloniaTest]
@@ -243,7 +243,7 @@ public class KaraokeTabViewTests
 
         foreach (double time in new[] { 6.2, 6.6, 7.5 })
         {
-            f.Clock.CurrentTime.Value = S(time);
+            f.Clock.Seek(MediaTime.FromSeconds(time));
             Press(window, Key.T, PhysicalKey.T);
         }
 
@@ -325,6 +325,19 @@ public class KaraokeTabViewTests
             Assert.That(titleOrigin.X, Is.GreaterThan(listOrigin.X + list.Bounds.Width));
         else
             Assert.That(titleOrigin.Y, Is.GreaterThan(listOrigin.Y + list.Bounds.Height));
+
+        SaveForInspection(window, $"karaoke-tab-{width}.png");
+    }
+
+    private static void SaveForInspection(Window window, string name)
+    {
+        using var frame = window.CaptureRenderedFrame();
+        Assert.That(frame, Is.Not.Null);
+        string directory = Path.Combine(TestContext.CurrentContext.WorkDirectory, "rendered");
+        Directory.CreateDirectory(directory);
+        string path = Path.Combine(directory, name);
+        frame!.Save(path, Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
+        TestContext.AddTestAttachment(path);
     }
 
     private static Control CreateLyricsEditor(KaraokeDrawable drawable, IServiceProvider? services)
@@ -333,13 +346,25 @@ public class KaraokeTabViewTests
         List<IPropertyAdapter> adapters = drawable.Properties.Select(p => (IPropertyAdapter)Activator.CreateInstance(
             typeof(EnginePropertyAdapter<>).MakeGenericType(p.ValueType), p, drawable)!).ToList();
 
-        IPropertyAdapter[] claimed = adapters.Where(a => extension.MatchProperty([a]).Any()).ToArray();
+        const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+        var registry = (PropertyEditorRegistry)typeof(PropertyEditorExtension).GetProperty("Registry", flags)!.GetValue(extension)!;
+        var registrations = (System.Collections.IEnumerable)typeof(PropertyEditorRegistry).GetProperty("Registrations", flags)!.GetValue(registry)!;
+        object registration = registrations.Cast<object>().Single();
+        Type type = registration.GetType();
+        var valueType = (Type)type.GetProperty("ValueType")!.GetValue(registration)!;
+        Assert.That(valueType, Is.EqualTo(typeof(KaraokeLyrics)));
+        IPropertyAdapter[] claimed = adapters.Where(a => a.PropertyType == valueType).ToArray();
         Assert.That(claimed.Select(a => a.GetEngineProperty()!.Name), Is.EqualTo(new[] { nameof(KaraokeDrawable.Lyrics) }));
-        Assert.That(extension.TryCreateContext(claimed, out IPropertyEditorContext? context), Is.True);
+        var createContext = (Func<IReadOnlyList<IPropertyAdapter>, IPropertyEditorContext?>)type.GetProperty("CreateContext")!.GetValue(registration)!;
+        IPropertyEditorContext context = createContext(claimed)!;
+        Assert.That(context, Is.TypeOf<LyricsPropertyEditorExtension.Context>());
         if (services != null)
-            context!.Accept(new Visitor(services));
-        Assert.That(extension.TryCreateControl(context!, out Control? control), Is.True);
-        return control!;
+            context.Accept(new Visitor(services));
+        var createControl = (Delegate)type.GetProperty("CreateControl")!.GetValue(registration)!;
+        object panel = Enum.Parse(createControl.Method.GetParameters()[1].ParameterType, "Panel");
+        var control = (Control)createControl.DynamicInvoke(context, panel)!;
+        Assert.That(createControl.DynamicInvoke(context, panel), Is.Not.SameAs(control));
+        return control;
     }
 
     [AvaloniaTest]
@@ -352,6 +377,7 @@ public class KaraokeTabViewTests
         Dispatcher.UIThread.RunJobs();
 
         Assert.That(Find<TextBlock>(control).Select(t => t.Text), Is.SupersetOf(new[] { "歌詞", "3 行" }));
+        SaveForInspection(window, "karaoke-property-editor.png");
         Button edit = Find<Button>(control).Single();
         edit.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         edit.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
@@ -370,7 +396,7 @@ public class KaraokeTabViewTests
         Assert.That(tab.Target.Value, Is.SameAs(other));
         tab.Dispose();
 
-        f.Drawable.Lyrics.CurrentValue = KaraokeLyrics.Empty;
+        f.Drawable.Lyrics.Value = KaraokeLyrics.Empty;
         Dispatcher.UIThread.RunJobs();
         Assert.That(Find<TextBlock>(control).Select(t => t.Text), Does.Contain("0 行"));
     }

@@ -47,7 +47,7 @@ public class KaraokeTabViewModelTests
 
         // Selecting other things on the timeline does not change what the tab edits.
         KaraokeDrawable other = f.AddKaraoke("[00:01.00]べつ\n[00:02.00]\n", S(20));
-        f.Selection.SelectedObject.Value = other.FindHierarchicalParent<Element>();
+        f.Selection.Select(other.FindHierarchicalParent<Element>());
         Assert.That(f.ViewModel.Target.Value, Is.SameAs(f.Drawable));
 
         f.ViewModel.SetTarget(other);
@@ -226,14 +226,14 @@ public class KaraokeTabViewModelTests
     public void UnreadableInputIsRevertedWithAMessage()
     {
         using EditorFixture f = Selected();
-        KaraokeLyrics before = f.Drawable.Lyrics.CurrentValue;
+        KaraokeLyrics before = f.Drawable.Lyrics.Value;
         LyricRowViewModel row = f.ViewModel.Rows[1];
 
         row.StartText = "abc";
         row.Text = "  ";
         row.Segments[0].TimeText = "x";
 
-        Assert.That(f.Drawable.Lyrics.CurrentValue, Is.SameAs(before));
+        Assert.That(f.Drawable.Lyrics.Value, Is.SameAs(before));
         Assert.That(f.History.CanUndo, Is.False);
         Assert.That((row.StartText, row.Text, row.Segments[0].TimeText), Is.EqualTo(("0:03.000", "にい", "0:03.000")));
         Assert.That(f.ViewModel.Status.Value, Does.Contain("元に戻しました"));
@@ -266,15 +266,15 @@ public class KaraokeTabViewModelTests
         Assert.That(f.ViewModel.TapState.Value, Is.EqualTo(new TapProgress("さん", 0, 1, 0, 2)));
 
         // The element starts at 1 s, so the playhead at 6.2 s is 5.2 s into the lyrics.
-        f.Clock.CurrentTime.Value = S(6.2);
+        f.Clock.Seek(MediaTime.FromSeconds(6.2));
         f.ViewModel.Tap();
         Assert.That(f.ViewModel.TapPrompt.Value, Does.Contain("「ん」"));
-        f.Clock.CurrentTime.Value = S(6.6);
+        f.Clock.Seek(MediaTime.FromSeconds(6.6));
         f.ViewModel.Tap();
         Assert.That(f.ViewModel.TapPrompt.Value, Does.Contain("歌い終わり"));
         Assert.That(f.Lines[2].HasWordTiming, Is.False, "Nothing changes until the last tap.");
 
-        f.Clock.CurrentTime.Value = S(7.5);
+        f.Clock.Seek(MediaTime.FromSeconds(7.5));
         f.ViewModel.Tap();
 
         LyricLine line = f.Lines[2];
@@ -294,11 +294,11 @@ public class KaraokeTabViewModelTests
         LyricRowViewModel row = f.ViewModel.Rows[2];
 
         f.ViewModel.StartTapping(row);
-        f.Clock.CurrentTime.Value = S(6.5);
+        f.Clock.Seek(MediaTime.FromSeconds(6.5));
         f.ViewModel.Tap();
-        f.Clock.CurrentTime.Value = S(6.0);
+        f.Clock.Seek(MediaTime.FromSeconds(6.0));
         f.ViewModel.Tap();
-        f.Clock.CurrentTime.Value = S(7.0);
+        f.Clock.Seek(MediaTime.FromSeconds(7.0));
         f.ViewModel.Tap();
         Assert.That(f.Lines[2].Words.Select(w => w.Start.TotalSeconds), Is.EqualTo(new[] { 5.5, 5.5 }));
 
@@ -317,13 +317,13 @@ public class KaraokeTabViewModelTests
         f.ViewModel.TapStartsPlayback.Value = false;
         f.ViewModel.StartTapping(f.ViewModel.Rows[2]);
 
-        f.Clock.CurrentTime.Value = S(6.0);
+        f.Clock.Seek(MediaTime.FromSeconds(6.0));
         f.Player!.Playing.Value = true;
         // The first frames are shown late, the earliest by 0.05 s, so the audio left 6.0 s 0.05 s after playback was asked for.
         f.Time.Advance(0.1);
-        f.Clock.CurrentTime.Value = S(6.05);
+        f.Clock.Seek(MediaTime.FromSeconds(6.05));
         f.Time.Advance(0.1);
-        f.Clock.CurrentTime.Value = S(6.1);
+        f.Clock.Seek(MediaTime.FromSeconds(6.1));
 
         // Then rendering stalls and the playhead stays at 6.1 s, while the taps follow the time since the audio started.
         f.Time.Advance(0.05);
@@ -347,7 +347,7 @@ public class KaraokeTabViewModelTests
 
         foreach (double time in new[] { 6.2, 6.6, 7.5 })
         {
-            f.Clock.CurrentTime.Value = S(time);
+            f.Clock.Seek(MediaTime.FromSeconds(time));
             f.Time.Advance(10);
             f.ViewModel.Tap();
         }
@@ -361,12 +361,12 @@ public class KaraokeTabViewModelTests
     {
         using var f = new EditorFixture(withPlayer: true);
         f.ViewModel.SetTarget(f.Drawable);
-        f.Clock.CurrentTime.Value = S(6.0);
+        f.Clock.Seek(MediaTime.FromSeconds(6.0));
         f.ViewModel.StartTapping(f.ViewModel.Rows[2]);
         Assert.That(f.ViewModel.TapPrompt.Value, Is.EqualTo("T で再生を開始"));
 
         f.ViewModel.Tap();
-        Assert.That(f.Context.Commands, Is.EqualTo(new[] { "PlayPause" }));
+        Assert.That(f.Context.Commands, Is.EqualTo(new[] { "editor.playPause" }));
         Assert.That(f.Player!.Playing.Value, Is.True);
         Assert.That(f.ViewModel.TapState.Value!.Tapped, Is.Zero, "The tap that starts playback is not timed.");
         Assert.That(f.ViewModel.TapPrompt.Value, Does.Contain("「さ」"));
@@ -388,14 +388,14 @@ public class KaraokeTabViewModelTests
     {
         using var f = new EditorFixture(withPlayer: true);
         f.ViewModel.SetTarget(f.Drawable);
-        f.Clock.CurrentTime.Value = S(6.0);
+        f.Clock.Seek(MediaTime.FromSeconds(6.0));
         f.ViewModel.StartTapping(f.ViewModel.Rows[2]);
         f.ViewModel.Tap();
         f.Time.Advance(0.2);
         f.ViewModel.Tap();
 
         // The user pauses at 6.3 s.
-        f.Clock.CurrentTime.Value = S(6.3);
+        f.Clock.Seek(MediaTime.FromSeconds(6.3));
         f.Player!.Playing.Value = false;
         Assert.That(f.ViewModel.TapPrompt.Value, Is.EqualTo("T で再生を開始"));
 
@@ -456,8 +456,8 @@ public class KaraokeTabViewModelTests
     public void AddPutsALineAtThePlayhead()
     {
         using EditorFixture f = Selected();
-        f.Drawable.TimeOffset.CurrentValue = S(0.5);
-        f.Clock.CurrentTime.Value = S(9.5);
+        f.Drawable.TimeOffset.Value = MediaTime.FromSeconds(0.5);
+        f.Clock.Seek(MediaTime.FromSeconds(9.5));
         LyricRowViewModel? added = null;
         f.ViewModel.RowFocusRequested += row => added = row;
 
@@ -541,7 +541,7 @@ public class KaraokeTabViewModelTests
 
         byte[] bytes = File.ReadAllBytes(path);
         Assert.That(bytes[0], Is.EqualTo((byte)'['), "no byte order mark");
-        Assert.That(new KaraokeLyrics(LyricsImport.ReadFile(path, out bool timed)), Is.EqualTo(f.Drawable.Lyrics.CurrentValue));
+        Assert.That(new KaraokeLyrics(LyricsImport.ReadFile(path, out bool timed)), Is.EqualTo(f.Drawable.Lyrics.Value));
         Assert.That(timed, Is.True);
     }
 
@@ -549,15 +549,15 @@ public class KaraokeTabViewModelTests
     public void PlayheadButtonsUseTheTimelinePosition()
     {
         using EditorFixture f = Selected();
-        f.Drawable.TimeOffset.CurrentValue = S(0.5);
+        f.Drawable.TimeOffset.Value = MediaTime.FromSeconds(0.5);
 
         f.ViewModel.Seek(f.ViewModel.Rows[2]);
-        Assert.That(f.Clock.CurrentTime.Value, Is.EqualTo(S(6.5)), "さん starts at 5 s, plus the 1 s start and 0.5 s offset");
+        Assert.That(f.Clock.CurrentTime.Value, Is.EqualTo(MediaTime.FromSeconds(6.5)), "さん starts at 5 s, plus the 1 s start and 0.5 s offset");
 
-        f.Clock.CurrentTime.Value = S(8);
+        f.Clock.Seek(MediaTime.FromSeconds(8));
         f.ViewModel.SetEndToPlayhead(f.ViewModel.Rows[2]);
         Assert.That(f.Lines[2].End, Is.EqualTo(S(6.5)));
-        f.Clock.CurrentTime.Value = S(5);
+        f.Clock.Seek(MediaTime.FromSeconds(5));
         f.ViewModel.SetStartToPlayhead(f.ViewModel.Rows[2]);
         Assert.That(f.Lines[2].Start, Is.EqualTo(S(3.5)));
     }

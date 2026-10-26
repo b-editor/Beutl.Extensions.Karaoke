@@ -1,4 +1,4 @@
-<Project Sdk="Beutl.Extensibility.Sdk/2.0.0-preview.8">
+<Project Sdk="Beutl.Extensibility.Sdk/2.0.0-preview.9">
 
     <PropertyGroup>
         <PackageId>Beutl.Extensions.Karaoke</PackageId>
@@ -18,7 +18,7 @@
             Include="Beutl.Engine.SourceGenerators"
             OutputItemType="Analyzer"
             ReferenceOutputAssembly="false"
-            Version="2.0.0-preview.8"
+            Version="2.0.0-preview.9"
             PrivateAssets="all" />
     </ItemGroup>
 
@@ -31,9 +31,9 @@
         <!-- The icons Beutl's own tool tabs use. Beutl ships these assemblies, so compile against the same version
              and leave them, and what they pull in (such as native SkiaSharp), out of the output: at run time the
              extension uses Beutl's copies. Same exclusion as the SDK applies to the Beutl packages. -->
-        <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="2.1.343" ExcludeAssets="runtime;native" PrivateAssets="all" />
-        <PackageReference Include="FluentIcons.Common" Version="2.1.343" ExcludeAssets="runtime;native" PrivateAssets="all" />
-        <PackageReference Include="FluentIcons.Resources.Avalonia" Version="2.1.343" ExcludeAssets="runtime;native" PrivateAssets="all" />
+        <PackageReference Include="FluentIcons.Avalonia.Fluent" Version="2.1.344" ExcludeAssets="runtime;native" PrivateAssets="all" />
+        <PackageReference Include="FluentIcons.Common" Version="2.1.344" ExcludeAssets="runtime;native" PrivateAssets="all" />
+        <PackageReference Include="FluentIcons.Resources.Avalonia" Version="2.1.344" ExcludeAssets="runtime;native" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>

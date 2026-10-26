@@ -46,16 +46,17 @@ public sealed class KaraokeTabViewModel : IToolContext
     // Taps are timed in real time while playing. The playhead only moves when a rendered frame is shown, so it
     // steps by frames and falls behind the audio when rendering is slow; the time since playback started does not.
     private readonly IPreviewPlayer? _player;
-    private readonly IContextCommandHandler? _commands;
+    private readonly IEditorContext? _editor;
+    private readonly ContextCommandDefinition? _playPause;
     private readonly IDisposable? _playingSubscription;
     private readonly IDisposable? _frameSubscription;
     private readonly Lock _playbackLock = new();
     private bool _playing;
     // The scene time playback started from, the moment on Time when the audio was there, and the last frame shown.
     // Until a frame is shown, the moment is when playback was asked for.
-    private TimeSpan _playStart;
+    private MediaTime _playStart;
     private TimeSpan _playOrigin;
-    private TimeSpan _lastFrame;
+    private MediaTime _lastFrame;
     private bool _anchored;
     // Whether a tap started playback, so that the tab stops it again when the line is done.
     private bool _startedPlayback;
@@ -68,8 +69,8 @@ public sealed class KaraokeTabViewModel : IToolContext
         _clock = services.GetService(typeof(IEditorClock)) as IEditorClock;
         _history = services.GetService(typeof(HistoryManager)) as HistoryManager;
         _player = services.GetService(typeof(IPreviewPlayer)) as IPreviewPlayer;
-        // The editor handles its own commands, such as PlayPause.
-        _commands = services as IContextCommandHandler;
+        _editor = services as IEditorContext;
+        _playPause = _editor?.Extension.ContextCommands.FirstOrDefault(command => command.Id == "editor.playPause");
         if (_player != null && _clock != null)
         {
             _playingSubscription = _player.IsPlaying.Subscribe(OnPlayingChanged);
@@ -179,10 +180,10 @@ public sealed class KaraokeTabViewModel : IToolContext
     public void SelectTargetInTimeline()
     {
         if (_selection != null && TargetElement.Value is { } element)
-            _selection.SelectedObject.Value = element;
+            _selection.Select(element);
     }
 
-    private KaraokeLyrics CurrentLyrics => Target.Value?.Lyrics.CurrentValue ?? KaraokeLyrics.Empty;
+    private KaraokeLyrics CurrentLyrics => Target.Value?.Lyrics.Value ?? KaraokeLyrics.Empty;
 
     // ---------------------------------------------------------------- lines
 
@@ -216,7 +217,7 @@ public sealed class KaraokeTabViewModel : IToolContext
     public void SeekTo(TimeSpan lyricTime)
     {
         if (_clock != null && TargetElement.Value is { } element && Target.Value is { } drawable)
-            _clock.CurrentTime.Value = element.Start + drawable.TimeOffset.CurrentValue + lyricTime;
+            _clock.Seek(element.Start.Value + drawable.TimeOffset.Value + MediaTime.FromTimeSpan(lyricTime));
     }
 
     public void SetStartToPlayhead(LyricRowViewModel row)
@@ -281,7 +282,7 @@ public sealed class KaraokeTabViewModel : IToolContext
         if (WaitsForPlayback)
         {
             _startedPlayback = true;
-            _ = _commands!.ExecuteAsync(new ContextCommandExecution("PlayPause"));
+            _ = _playPause!.RunAsync(_editor, new ContextCommandExecution(_playPause.Id) { EditorContext = _editor });
             UpdateTapPrompt();
             return;
         }
@@ -325,7 +326,8 @@ public sealed class KaraokeTabViewModel : IToolContext
     }
 
     // Whether the next tap starts playback rather than being timed.
-    private bool WaitsForPlayback => TapStartsPlayback.Value && _commands != null && _player is { IsPlaying.Value: false };
+    private bool WaitsForPlayback => TapStartsPlayback.Value && _player is { IsPlaying.Value: false }
+        && _playPause?.CanRun(_editor, new ContextCommandExecution(_playPause.Id) { EditorContext = _editor }) == true;
 
     private void UpdateTapPrompt()
     {
@@ -374,7 +376,7 @@ public sealed class KaraokeTabViewModel : IToolContext
 
     // Each frame is shown at or after its time, so it bounds when the audio was at the start, and the earliest bound
     // is the closest. A frame before the last one means playback was moved back, so it starts again from there.
-    private void OnFrameShown(TimeSpan time)
+    private void OnFrameShown(MediaTime time)
     {
         lock (_playbackLock)
         {
@@ -387,7 +389,7 @@ public sealed class KaraokeTabViewModel : IToolContext
                 _playStart = time;
                 _playOrigin = now;
             }
-            else if (now - (time - _playStart) is var origin && (!_anchored || origin < _playOrigin))
+            else if (now - (time - _playStart).ToTimeSpan() is var origin && (!_anchored || origin < _playOrigin))
             {
                 _playOrigin = origin;
             }
@@ -398,12 +400,12 @@ public sealed class KaraokeTabViewModel : IToolContext
     }
 
     // The scene time to tap at: how long playback has run while playing, the playhead otherwise.
-    private TimeSpan? SceneTimeNow()
+    private MediaTime? SceneTimeNow()
     {
         lock (_playbackLock)
         {
             if (_playing)
-                return _playStart + (Time.GetElapsedTime(0) - _playOrigin);
+                return _playStart + MediaTime.FromTimeSpan(Time.GetElapsedTime(0) - _playOrigin);
         }
 
         return _clock?.CurrentTime.Value;
@@ -637,12 +639,12 @@ public sealed class KaraokeTabViewModel : IToolContext
 
     private TimeSpan? Playhead() => ToLyricTime(_clock?.CurrentTime.Value);
 
-    private TimeSpan? ToLyricTime(TimeSpan? sceneTime)
+    private TimeSpan? ToLyricTime(MediaTime? sceneTime)
     {
         if (sceneTime is not { } scene || TargetElement.Value is not { } element || Target.Value is not { } drawable)
             return null;
 
-        TimeSpan time = scene - element.Start - drawable.TimeOffset.CurrentValue;
+        TimeSpan time = (scene - element.Start.Value - drawable.TimeOffset.Value).ToTimeSpan();
         return time < TimeSpan.Zero ? TimeSpan.Zero : time;
     }
 
@@ -654,7 +656,7 @@ public sealed class KaraokeTabViewModel : IToolContext
         _committing = true;
         try
         {
-            drawable.Lyrics.CurrentValue = lyrics;
+            drawable.Lyrics.Value = lyrics;
             _history?.Commit(commandName);
         }
         finally
@@ -699,8 +701,8 @@ public sealed class KaraokeTabViewModel : IToolContext
         }
 
         TargetDescription.Value = element == null ? ""
-            : !string.IsNullOrWhiteSpace(element.Name) ? $"要素「{element.Name}」"
-            : $"{LrcWriter.FormatTime(element.Start)} から始まる要素";
+            : !string.IsNullOrWhiteSpace(element.Name.Value) ? $"要素「{element.Name.Value}」"
+            : $"{LrcWriter.FormatTime(element.Start.Value.ToTimeSpan())} から始まる要素";
     }
 
     private void OnLyricsChanged(object? sender, PropertyValueChangedEventArgs<KaraokeLyrics> e)
@@ -753,7 +755,7 @@ public sealed class KaraokeTabViewModel : IToolContext
         json[nameof(TapStartsPlayback)] = TapStartsPlayback.Value;
         // A tab restored with the layout finds its object again by id.
         if (_bound != null)
-            json["Target"] = _bound.Id.ToString();
+            json["Target"] = _bound.Id.Value.ToString();
     }
 
     public void ReadFromJson(JsonObject json)
@@ -781,7 +783,7 @@ public sealed class KaraokeTabViewModel : IToolContext
         {
             foreach (IHierarchical child in node.HierarchicalChildren)
             {
-                if (child is KaraokeDrawable drawable && drawable.Id == id)
+                if (child is KaraokeDrawable drawable && drawable.Id.Value == id)
                     return drawable;
                 if (Find(child, id) is { } found)
                     return found;
