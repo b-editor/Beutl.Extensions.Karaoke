@@ -117,68 +117,6 @@ public sealed partial class KaraokeDrawable : Drawable, IOriginalDurationProvide
             TimeOffset.Value -= startDelta;
     }
 
-    protected override Size MeasureCore(Size availableSize, Drawable.Resource resource)
-    {
-        var r = (Resource)resource;
-        if (r.GetLayout() is not { } layout)
-            return default;
-
-        int rows = r.Layout == KaraokeLayout.TwoLines ? 2 : 1;
-        return new Size(layout.MaxWidth, layout.LineHeight * rows + Math.Max(0, r.LineSpacing) * (rows - 1));
-    }
-
-    protected override void OnDraw(GraphicsContext2D context, Drawable.Resource resource)
-    {
-        var r = (Resource)resource;
-        if (r.GetLayout() is not { } layout || r.Document is not { } document || r.Schedule is not { } schedule)
-            return;
-
-        TimeSpan time = r.LyricTime;
-        float fade = Math.Max(0, r.FadeDuration);
-        float pad = Math.Max(StrokeOutset(r.TextStroke), StrokeOutset(r.SungStroke)) + 2;
-
-        foreach (LineSchedule entry in schedule)
-        {
-            if (time < entry.Show || time >= entry.Hide)
-                continue;
-
-            LyricLine line = document.Lines[entry.LineIndex];
-            FormattedText text = layout.Texts[entry.LineIndex];
-            FormattedText sungText = layout.SungTexts[entry.LineIndex];
-            // A text's outline is built from its own pen, not the one passed to DrawText.
-            text.Pen = r.TextStroke;
-            sungText.Pen = r.SungStroke;
-
-            float width = layout.CharX[entry.LineIndex][^1];
-            float x = r.Layout == KaraokeLayout.SingleLine
-                ? (layout.MaxWidth - width) / 2
-                : entry.Row == 0 ? 0 : layout.MaxWidth - width;
-            float rowTop = entry.Row * (layout.LineHeight + Math.Max(0, r.LineSpacing));
-
-            float opacity = 1;
-            if (fade > 0)
-            {
-                opacity = (float)Math.Clamp(Math.Min((time - entry.Show).TotalSeconds, (entry.Hide - time).TotalSeconds) / fade, 0, 1);
-            }
-
-            float sungX = layout.GetX(entry.LineIndex, KaraokeTimeline.GetSungCharacters(line, time));
-            using (context.PushOpacity(opacity))
-            using (context.PushTransform(Matrix.CreateTranslation(x, rowTop - layout.Ascent)))
-            {
-                context.DrawText(text, r.TextFill, r.TextStroke);
-                if (sungX > 0)
-                {
-                    // In baseline coordinates the row spans [Ascent, Descent]; the pad keeps outlines inside.
-                    var clip = new Rect(-pad, layout.Ascent - pad, sungX + pad, layout.LineHeight + pad * 2);
-                    using (context.PushClip(clip))
-                    {
-                        context.DrawText(sungText, r.SungFill, r.SungStroke);
-                    }
-                }
-            }
-        }
-    }
-
     private static float StrokeOutset(Pen.Resource? pen) => pen == null ? 0 : Math.Max(0, pen.Thickness);
 
     public partial class Resource
@@ -188,11 +126,71 @@ public sealed partial class KaraokeDrawable : Drawable, IOriginalDurationProvide
         private (KaraokeLayout, float, float) _scheduleKey;
         private KaraokeLyrics? _documentLyrics;
 
-        internal TimeSpan LyricTime { get; private set; }
+        private TimeSpan LyricTime { get; set; }
 
-        internal LyricsDocument? Document { get; private set; }
+        private LyricsDocument? Document { get; set; }
 
-        internal LineSchedule[]? Schedule { get; private set; }
+        private LineSchedule[]? Schedule { get; set; }
+
+        protected override Size MeasureCore(Size availableSize)
+        {
+            if (GetLayout() is not { } layout)
+                return default;
+
+            int rows = Layout == KaraokeLayout.TwoLines ? 2 : 1;
+            return new Size(layout.MaxWidth, layout.LineHeight * rows + Math.Max(0, LineSpacing) * (rows - 1));
+        }
+
+        protected override void OnDraw(GraphicsContext2D context)
+        {
+            if (GetLayout() is not { } layout || Document is not { } document || Schedule is not { } schedule)
+                return;
+
+            TimeSpan time = LyricTime;
+            float fade = Math.Max(0, FadeDuration);
+            float pad = Math.Max(StrokeOutset(TextStroke), StrokeOutset(SungStroke)) + 2;
+
+            foreach (LineSchedule entry in schedule)
+            {
+                if (time < entry.Show || time >= entry.Hide)
+                    continue;
+
+                LyricLine line = document.Lines[entry.LineIndex];
+                FormattedText text = layout.Texts[entry.LineIndex];
+                FormattedText sungText = layout.SungTexts[entry.LineIndex];
+                // A text's outline is built from its own pen, not the one passed to DrawText.
+                text.Pen = TextStroke;
+                sungText.Pen = SungStroke;
+
+                float width = layout.CharX[entry.LineIndex][^1];
+                float x = Layout == KaraokeLayout.SingleLine
+                    ? (layout.MaxWidth - width) / 2
+                    : entry.Row == 0 ? 0 : layout.MaxWidth - width;
+                float rowTop = entry.Row * (layout.LineHeight + Math.Max(0, LineSpacing));
+
+                float opacity = 1;
+                if (fade > 0)
+                {
+                    opacity = (float)Math.Clamp(Math.Min((time - entry.Show).TotalSeconds, (entry.Hide - time).TotalSeconds) / fade, 0, 1);
+                }
+
+                float sungX = layout.GetX(entry.LineIndex, KaraokeTimeline.GetSungCharacters(line, time));
+                using (context.PushOpacity(opacity))
+                using (context.PushTransform(Matrix.CreateTranslation(x, rowTop - layout.Ascent)))
+                {
+                    context.DrawText(text, TextFill, TextStroke);
+                    if (sungX > 0)
+                    {
+                        // In baseline coordinates the row spans [Ascent, Descent]; the pad keeps outlines inside.
+                        var clip = new Rect(-pad, layout.Ascent - pad, sungX + pad, layout.LineHeight + pad * 2);
+                        using (context.PushClip(clip))
+                        {
+                            context.DrawText(sungText, SungFill, SungStroke);
+                        }
+                    }
+                }
+            }
+        }
 
         partial void PostReconcile(KaraokeDrawable obj, CompositionContext context)
         {
@@ -235,7 +233,7 @@ public sealed partial class KaraokeDrawable : Drawable, IOriginalDurationProvide
             Document = Lyrics is { Count: > 0 } lyrics ? new LyricsDocument(lyrics.Lines, null, null) : null;
         }
 
-        internal LyricsLayout? GetLayout()
+        private LyricsLayout? GetLayout()
         {
             if (Document is not { Lines.Count: > 0 } document)
                 return null;
