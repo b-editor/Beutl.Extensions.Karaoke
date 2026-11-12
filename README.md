@@ -93,7 +93,7 @@
 
 ## 開発
 
-`Beutl.Extensibility.Sdk` 2.0.0-preview.11 でビルドします。
+`Beutl.Extensibility.Sdk` 2.0.0-preview.12 と .NET 11 SDK でビルドします。
 
 ```bash
 dotnet build src/Beutl.Extensions.Karaoke
@@ -103,7 +103,7 @@ dotnet build src/Beutl.Extensions.Karaoke
 dotnet test tests/Beutl.Extensions.Karaoke.Tests
 ```
 
-テストには、LRCパーサー・保存形式・区切り・表示タイミングの単体テスト、Beutlの `SceneRenderer` でシーンをヘッドレスに描画して色の境目を確認するテスト、Avaloniaのヘッドレス環境でツールタブを操作するテストがあります。描画した画像は `bin/Debug/net10.0/rendered/` に保存されます。
+テストには、LRCパーサー・保存形式・区切り・表示タイミングの単体テスト、Beutlの `SceneRenderer` でシーンをヘッドレスに描画して色の境目を確認するテスト、Avaloniaのヘッドレス環境でツールタブを操作するテストがあります。描画した画像は `bin/Debug/net11.0/rendered/` に保存されます。
 
 Beutlにサイドロードして試す場合は、次のコマンドで `~/.beutl/sideloads` に出力します。
 
