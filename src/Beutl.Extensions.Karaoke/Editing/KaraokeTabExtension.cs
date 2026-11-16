@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Beutl.Extensibility;
+using Beutl.Extensions.Karaoke.Localization;
 
 namespace Beutl.Extensions.Karaoke.Editing;
 
@@ -12,7 +13,7 @@ public sealed class KaraokeTabExtension : ToolTabExtension
 
     public override string Name => "Karaoke editor";
 
-    public override string DisplayName => "カラオケ字幕";
+    public override string DisplayName => Strings.KaraokeTitle;
 
     // Not in the add-tab menu: the tab is opened from an object's "編集" button and edits that object.
     public override string? Header => null;

@@ -2,6 +2,7 @@ using System.Text.Json.Nodes;
 using Avalonia.Headless.NUnit;
 using Beutl.Extensions.Karaoke.Editing;
 using Beutl.Extensions.Karaoke.Graphics;
+using Beutl.Extensions.Karaoke.Localization;
 using Beutl.Extensions.Karaoke.Lyrics;
 using Beutl.ProjectSystem;
 
@@ -9,6 +10,7 @@ namespace Beutl.Extensions.Karaoke.Tests;
 
 // Runs on the Avalonia UI thread, where the editor runs the tool tab. The fixture's element starts at 1 s and
 // holds "いち" (1-3 s), "にい" timed per character (3-5 s, に at 3.0, い at 3.5, sung by 4.0) and "さん" (5-7 s).
+[SetUICulture("ja-JP")]
 public class KaraokeTabViewModelTests
 {
     private static TimeSpan S(double seconds) => TimeSpan.FromSeconds(seconds);
@@ -466,6 +468,34 @@ public class KaraokeTabViewModelTests
         // The element starts at 1 s and the lyrics are offset by 0.5 s.
         Assert.That(f.Lines[^1].Start, Is.EqualTo(S(8)));
         Assert.That(added?.Text, Is.EqualTo("歌詞"));
+    }
+
+    [AvaloniaTest]
+    [TestCase("en-US")]
+    [TestCase("ja-JP")]
+    [TestCase("zh-CN")]
+    [TestCase("ko-KR")]
+    [TestCase("es-ES")]
+    [SetCulture("es-ES")]
+    public void LocalizedNewLinesKeepTheirFullTextAndInvariantTimes(string culture)
+    {
+        using var scope = new UiCultureScope(culture);
+        using var f = new EditorFixture("");
+        f.ViewModel.SetTarget(f.Drawable);
+        f.Clock.Seek(MediaTime.FromSeconds(2.25));
+
+        f.ViewModel.AddAtCurrentTime();
+
+        LyricLine line = f.Lines.Single();
+        Assert.That(line.Text, Is.EqualTo(Strings.DefaultLyricText));
+        Assert.That(line.Words.Single().Length, Is.EqualTo(line.Text.Length));
+        string lrc = LrcWriter.ToLrc(f.Lines);
+        Assert.That(lrc, Does.StartWith("[00:01.250]" + Strings.DefaultLyricText));
+        Assert.That(LrcParser.Parse(lrc).Lines.Single().Text, Is.EqualTo(line.Text));
+        Assert.That(f.History.Undo(), Is.True);
+        Assert.That(f.Lines, Is.Empty);
+        Assert.That(f.History.Redo(), Is.True);
+        Assert.That(f.Lines.Single().Text, Is.EqualTo(line.Text));
     }
 
     [AvaloniaTest]

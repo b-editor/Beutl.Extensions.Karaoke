@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <PackageId>Beutl.Extensions.Karaoke</PackageId>
-        <Title>カラオケ字幕</Title>
-        <Description>LRCファイルを読み込み、歌詞の色が単語ごとに塗り替わるカラオケ風の字幕を生成します</Description>
+        <Title>Karaoke subtitles</Title>
+        <Description>Import LRC files and create karaoke subtitles that change color as the lyrics are sung.</Description>
         <PackageTags>caption,lyrics,karaoke,lrc,歌詞,カラオケ</PackageTags>
         <Version>0.1.5</Version>
         <AssemblyVersion>0.1.5.0</AssemblyVersion>
@@ -11,6 +11,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>icon.png</PackageIcon>
         <BeutlAutoReferenceSourceGenerators>false</BeutlAutoReferenceSourceGenerators>
+        <NeutralLanguage>en</NeutralLanguage>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,6 +25,17 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="Beutl.Extensions.Karaoke.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Generate public resource properties for DisplayAttribute as part of every build. -->
+        <EmbeddedResource Update="Localization/Strings.resx">
+            <StronglyTypedLanguage>C#</StronglyTypedLanguage>
+            <StronglyTypedNamespace>Beutl.Extensions.Karaoke.Localization</StronglyTypedNamespace>
+            <StronglyTypedClassName>Strings</StronglyTypedClassName>
+            <StronglyTypedFileName>$(BaseIntermediateOutputPath)$(Configuration)/$(TargetFramework)/Strings.Designer.cs</StronglyTypedFileName>
+            <PublicClass>true</PublicClass>
+        </EmbeddedResource>
     </ItemGroup>
 
 

@@ -9,12 +9,14 @@ using Avalonia.VisualTree;
 using Beutl.Extensibility;
 using Beutl.Extensions.Karaoke.Editing;
 using Beutl.Extensions.Karaoke.Graphics;
+using Beutl.Extensions.Karaoke.Localization;
 using Beutl.Extensions.Karaoke.Lyrics;
 using Beutl.PropertyAdapters;
 
 namespace Beutl.Extensions.Karaoke.Tests;
 
 // Drives the tool tab view and the property panel's summary in a headless Avalonia session.
+[SetUICulture("ja-JP")]
 public class KaraokeTabViewTests
 {
     private static TimeSpan S(double seconds) => TimeSpan.FromSeconds(seconds);
@@ -308,10 +310,17 @@ public class KaraokeTabViewTests
     }
 
     [AvaloniaTest]
-    [TestCase(1300, true)]
-    [TestCase(560, false)]
-    public void TheEditorSitsBesideTheListWhenThereIsRoom(double width, bool beside)
+    [TestCase("ja-JP", 1300, true)]
+    [TestCase("ja-JP", 560, false)]
+    [TestCase("en-US", 1300, true)]
+    [TestCase("en-US", 560, false)]
+    [TestCase("zh-CN", 560, false)]
+    [TestCase("ko-KR", 560, false)]
+    [TestCase("es-ES", 1300, true)]
+    [TestCase("es-ES", 560, false)]
+    public void TheEditorSitsBesideTheListWhenThereIsRoom(string culture, double width, bool beside)
     {
+        using var scope = new UiCultureScope(culture);
         using var f = new EditorFixture();
         (Window window, KaraokeTabView view) = Open(f, width: width);
         Select(view, f.ViewModel.Rows[0]);
@@ -326,7 +335,41 @@ public class KaraokeTabViewTests
         else
             Assert.That(titleOrigin.Y, Is.GreaterThan(listOrigin.Y + list.Bounds.Height));
 
-        SaveForInspection(window, $"karaoke-tab-{width}.png");
+        SaveForInspection(window, $"karaoke-tab-{culture}-{width}.png");
+    }
+
+    [AvaloniaTest]
+    [TestCase("ja-JP")]
+    [TestCase("en-US")]
+    [TestCase("zh-CN")]
+    [TestCase("ko-KR")]
+    [TestCase("es-ES")]
+    public void ImportAndTimingUseTheSelectedLanguage(string culture)
+    {
+        using var scope = new UiCultureScope(culture);
+        using var f = new EditorFixture("");
+        (Window window, KaraokeTabView view) = Open(f, width: 560);
+        Assert.That(f.ViewModel.Header.Value, Is.EqualTo(Strings.KaraokeTitle));
+
+        Click(ByTip(view, Strings.ImportLyrics));
+        Assert.That(Find<TextBox>(view).Single().PlaceholderText, Is.EqualTo(Strings.PastePlaceholder));
+        Assert.That(Find<ComboBox>(view).Single().ItemsSource, Is.EqualTo(new[] { Strings.Replace, Strings.Append }));
+        f.ViewModel.PastedText.Value = "Hello 世界\n안녕 Hola";
+        Click(view, Strings.Import);
+
+        Assert.That(f.Texts, Is.EqualTo(new[] { "Hello 世界", "안녕 Hola" }));
+        Assert.That(Find<TextBlock>(view).Select(t => t.Text), Is.SupersetOf(new[]
+        {
+            Strings.History, Strings.JobSucceeded, Strings.PastedLyrics,
+            string.Format(Strings.ImportedLines, 2) + string.Format(Strings.UntimedSpacing, 4),
+        }));
+        SaveForInspection(window, $"karaoke-import-{culture}.png");
+
+        Click(ByTip(view, Strings.BackShortcut));
+        Select(view, f.ViewModel.Rows[0]);
+        Click(view, Strings.TapTiming);
+        Assert.That(f.ViewModel.TapPrompt.Value, Is.EqualTo(string.Format(Strings.TapUnitPrompt, "Hello")));
+        SaveForInspection(window, $"karaoke-tapping-{culture}.png");
     }
 
     private static void SaveForInspection(Window window, string name)

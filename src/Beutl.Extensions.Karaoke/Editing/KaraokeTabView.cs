@@ -13,6 +13,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Beutl.Extensions.Karaoke.Localization;
 using Beutl.Extensions.Karaoke.Lyrics;
 using FluentIcons.Common;
 using static Beutl.Extensions.Karaoke.Editing.BeutlUi;
@@ -34,11 +35,6 @@ public sealed class KaraokeTabView : UserControl
 
     // Column header and about three rows: the list never shrinks below this when stacked.
     private const double ListPaneMinHeight = 150;
-
-    private static readonly FilePickerFileType s_lyricsFiles = new("歌詞ファイル")
-    {
-        Patterns = ["*.lrc", "*.txt"],
-    };
 
     private static readonly IValueConverter s_isZero = new FuncValueConverter<int, bool>(n => n == 0);
 
@@ -84,16 +80,16 @@ public sealed class KaraokeTabView : UserControl
         _list.SelectionChanged += OnSelectionChanged;
         _list.DoubleTapped += OnListDoubleTapped;
 
-        _deleteButton = IconButton(Icon.Delete, "削除 (Delete)", DeleteSelected);
+        _deleteButton = IconButton(Icon.Delete, Strings.DeleteShortcut, DeleteSelected);
         _deleteButton.IsEnabled = false;
-        _locateButton = IconButton(Icon.TargetArrow, "タイムラインで選択", () => ViewModel?.SelectTargetInTimeline());
+        _locateButton = IconButton(Icon.TargetArrow, Strings.SelectInTimeline, () => ViewModel?.SelectTargetInTimeline());
 
-        _detailNone = Secondary("行を選択してください");
+        _detailNone = Secondary(Strings.SelectLine);
         _detailMulti = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 8,
-            Children = { _detailMultiText, TextButton("削除", DeleteSelected) },
+            Children = { _detailMultiText, TextButton(Strings.Delete, DeleteSelected) },
         };
         (_detailSingle, _tapPanel, _timingTools) = BuildDetailForm();
 
@@ -158,7 +154,7 @@ public sealed class KaraokeTabView : UserControl
             _viewModel.RowFocusRequested += OnRowFocusRequested;
             // The tab does not follow the timeline selection; the locate button says which element it edits.
             _subscriptions.Add(_viewModel.TargetDescription.Subscribe(description =>
-                ToolTip.SetTip(_locateButton, string.IsNullOrEmpty(description) ? "タイムラインで選択" : $"タイムラインで選択（{description}）")));
+                ToolTip.SetTip(_locateButton, string.IsNullOrEmpty(description) ? Strings.SelectInTimeline : string.Format(Strings.SelectInTimelineDescription, description))));
             _subscriptions.Add(_viewModel.TotalCount.Subscribe(count => ApplyLayout(_wide, showDetail: count > 0)));
             _subscriptions.Add(_viewModel.TappingRow.Subscribe(_ => UpdateDetail()));
             _subscriptions.Add(_viewModel.TapState.Subscribe(UpdateTapLine));
@@ -213,13 +209,13 @@ public sealed class KaraokeTabView : UserControl
         TextBlock count = Secondary();
         count.VerticalAlignment = VerticalAlignment.Center;
         count.Margin = new Thickness(0, 0, 4, 0);
-        count[!TextBlock.TextProperty] = new Binding("TotalCount.Value") { StringFormat = "{0} 行" };
+        count[!TextBlock.TextProperty] = new Binding("TotalCount.Value") { StringFormat = Strings.LineCount };
 
-        var export = new MenuItem { Header = "LRC ファイルに書き出し…" };
+        var export = new MenuItem { Header = Strings.ExportLrcMenu };
         export.Click += (_, _) => ExportAsync();
-        var clear = new MenuItem { Header = "すべて削除" };
+        var clear = new MenuItem { Header = Strings.DeleteAll };
         clear.Click += (_, _) => ViewModel?.ClearAll();
-        Button more = IconButton(Icon.MoreVertical, "その他", () => { });
+        Button more = IconButton(Icon.MoreVertical, Strings.More, () => { });
         more.Flyout = new MenuFlyout { Items = { export, new Separator(), clear } };
 
         var actions = new StackPanel
@@ -228,9 +224,9 @@ public sealed class KaraokeTabView : UserControl
             Children =
             {
                 count,
-                IconButton(Icon.Add, "追加", () => ViewModel?.AddAtCurrentTime()),
+                IconButton(Icon.Add, Strings.Add, () => ViewModel?.AddAtCurrentTime()),
                 _deleteButton,
-                IconButton(Icon.ArrowDownload, "歌詞を取り込む", () => ViewModel?.OpenImportPage()),
+                IconButton(Icon.ArrowDownload, Strings.ImportLyrics, () => ViewModel?.OpenImportPage()),
                 _locateButton,
                 more,
             },
@@ -239,19 +235,19 @@ public sealed class KaraokeTabView : UserControl
 
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
         Grid.SetColumn(actions, 1);
-        row.Children.Add(BarTitle("カラオケ字幕"));
+        row.Children.Add(BarTitle(Strings.KaraokeTitle));
         row.Children.Add(actions);
         return ToolBar(row);
     }
 
     private Control BuildListPane()
     {
-        Grid header = Columns(Secondary("開始"), Secondary("終了"), Secondary("文字ごと"), Secondary("歌詞"));
+        Grid header = Columns(Secondary(Strings.Start), Secondary(Strings.End), Secondary(Strings.CharacterTiming), Secondary(Strings.Lyrics));
         header.Margin = new Thickness(9, 0, 9, 4);
 
         TextBlock emptyTitle = EmptyTitle();
         emptyTitle[!TextBlock.TextProperty] = new Binding("EmptyMessage.Value");
-        Button import = TextButton("取り込む…", () => ViewModel?.OpenImportPage(), accent: true);
+        Button import = TextButton(Strings.ImportEllipsis, () => ViewModel?.OpenImportPage(), accent: true);
         import[!IsVisibleProperty] = new Binding("TotalCount.Value") { Converter = s_isZero };
         StackPanel empty = EmptyState(Icon.MusicNote1, emptyTitle, import);
         empty[!IsVisibleProperty] = new Binding("EmptyMessage.Value") { Converter = StringConverters.IsNotNullOrEmpty };
@@ -301,32 +297,32 @@ public sealed class KaraokeTabView : UserControl
 
         TextBox start = Field(nameof(LyricRowViewModel.StartText));
         start.Width = 100;
-        AddRow(form, 0, "開始", new StackPanel
+        AddRow(form, 0, Strings.Start, new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 2,
             Children =
             {
                 start,
-                IconButton(Icon.ClockArrowDownload, "再生位置にする", () => WithRow(r => ViewModel?.SetStartToPlayhead(r))),
-                IconButton(Icon.ArrowStepIn, "この時刻へ移動", () => WithRow(r => ViewModel?.Seek(r))),
+                IconButton(Icon.ClockArrowDownload, Strings.SetToPlayhead, () => WithRow(r => ViewModel?.SetStartToPlayhead(r))),
+                IconButton(Icon.ArrowStepIn, Strings.SeekToTime, () => WithRow(r => ViewModel?.Seek(r))),
             },
         });
 
         TextBox end = Field(nameof(LyricRowViewModel.EndText));
         end.Width = 100;
-        AddRow(form, 1, "終了", new StackPanel
+        AddRow(form, 1, Strings.End, new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 2,
             Children =
             {
                 end,
-                IconButton(Icon.ClockArrowDownload, "再生位置にする", () => WithRow(r => ViewModel?.SetEndToPlayhead(r))),
+                IconButton(Icon.ClockArrowDownload, Strings.SetToPlayhead, () => WithRow(r => ViewModel?.SetEndToPlayhead(r))),
             },
         });
 
-        AddRow(form, 2, "歌詞", Field(nameof(LyricRowViewModel.Text)));
+        AddRow(form, 2, Strings.Lyrics, Field(nameof(LyricRowViewModel.Text)));
 
         // Per-character timing: the runs as chips with their times, or a note that there are none.
         var segments = new ItemsControl
@@ -337,8 +333,8 @@ public sealed class KaraokeTabView : UserControl
         };
         TextBox sungEnd = Field(nameof(LyricRowViewModel.SungEndText));
         sungEnd.Width = 88;
-        ToolTip.SetTip(sungEnd, "歌い終わり");
-        TextBlock sungEndLabel = Secondary("歌い終わり");
+        ToolTip.SetTip(sungEnd, Strings.SungEnd);
+        TextBlock sungEndLabel = Secondary(Strings.SungEnd);
         sungEndLabel.VerticalAlignment = VerticalAlignment.Center;
         var timed = new StackPanel
         {
@@ -350,14 +346,14 @@ public sealed class KaraokeTabView : UserControl
             },
             [!IsVisibleProperty] = new Binding(nameof(LyricRowViewModel.HasWordTiming)),
         };
-        TextBlock untimed = Secondary("未設定");
+        TextBlock untimed = Secondary(Strings.NotSet);
         untimed.Margin = new Thickness(0, 6, 0, 0);
         untimed[!IsVisibleProperty] = new Binding(nameof(LyricRowViewModel.HasWordTiming)) { Converter = BoolConverters.Not };
 
-        Button clearTiming = TextButton("消す", () => WithRow(r => ViewModel?.ClearWordTiming(r)));
+        Button clearTiming = TextButton(Strings.ClearTiming, () => WithRow(r => ViewModel?.ClearWordTiming(r)));
         clearTiming[!IsVisibleProperty] = new Binding(nameof(LyricRowViewModel.HasWordTiming));
-        Button tap = TextButton("タップで付ける", () => WithRow(r => ViewModel?.StartTapping(r)), accent: true);
-        ToolTip.SetTip(tap, "再生しながら、歌い出しごとに T キーで打ちます");
+        Button tap = TextButton(Strings.TapTiming, () => WithRow(r => ViewModel?.StartTapping(r)), accent: true);
+        ToolTip.SetTip(tap, Strings.TapTimingTip);
         var tools = new StackPanel
         {
             Spacing = 8,
@@ -369,22 +365,22 @@ public sealed class KaraokeTabView : UserControl
                 {
                     Orientation = Orientation.Horizontal,
                     Spacing = 6,
-                    Children = { tap, TextButton("均等に割り振る", () => WithRow(r => ViewModel?.DistributeEvenly(r))), clearTiming },
+                    Children = { tap, TextButton(Strings.DistributeEvenly, () => WithRow(r => ViewModel?.DistributeEvenly(r))), clearTiming },
                 },
             },
         };
 
         var prompt = new TextBlock { TextWrapping = TextWrapping.Wrap };
         prompt.Bind(TextBlock.TextProperty, new Binding("DataContext.TapPrompt.Value") { Source = this });
-        Button hit = TextButton("打つ (T)", () => ViewModel?.Tap(), accent: true);
+        Button hit = TextButton(Strings.TapShortcut, () => ViewModel?.Tap(), accent: true);
         hit.MinWidth = 120;
         _tapCount.VerticalAlignment = VerticalAlignment.Center;
         var startsPlayback = new CheckBox
         {
-            Content = "最初のタップで再生",
+            Content = Strings.TapStartsPlayback,
             [!CheckBox.IsCheckedProperty] = new Binding("DataContext.TapStartsPlayback.Value") { Source = this, Mode = BindingMode.TwoWay },
         };
-        ToolTip.SetTip(startsPlayback, "オフのときは、再生してから打ちます");
+        ToolTip.SetTip(startsPlayback, Strings.TapStartsPlaybackTip);
         var tapPanel = new StackPanel
         {
             Spacing = 8,
@@ -392,12 +388,12 @@ public sealed class KaraokeTabView : UserControl
             {
                 _tapLine,
                 prompt,
-                new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, Children = { hit, TextButton("やめる", () => ViewModel?.CancelTapping()), _tapCount } },
+                new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, Children = { hit, TextButton(Strings.Cancel, () => ViewModel?.CancelTapping()), _tapCount } },
                 startsPlayback,
             },
         };
 
-        AddRow(form, 3, "文字ごと", new Panel { Children = { tools, tapPanel } }, alignTop: true);
+        AddRow(form, 3, Strings.CharacterTiming, new Panel { Children = { tools, tapPanel } }, alignTop: true);
         return (form, tapPanel, tools);
     }
 
@@ -412,7 +408,7 @@ public sealed class KaraokeTabView : UserControl
             Content = new TextBlock { FontSize = 18, [!TextBlock.TextProperty] = new Binding(nameof(LyricSegmentViewModel.Text)) },
         };
         WithResource(character, StyledElement.ThemeProperty, "ToolTabBarIconButtonTheme");
-        ToolTip.SetTip(character, "この時刻へ移動");
+        ToolTip.SetTip(character, Strings.SeekToTime);
         character.Click += (_, _) =>
         {
             if (LrcWriter.TryParseTime(segment.TimeText, out TimeSpan time))
@@ -541,7 +537,7 @@ public sealed class KaraokeTabView : UserControl
         IReadOnlyList<LyricRowViewModel> rows = SelectedRows();
         _detailNone.IsVisible = rows.Count == 0;
         _detailMulti.IsVisible = rows.Count > 1;
-        _detailMultiText.Text = $"{rows.Count} 行を選択中";
+        _detailMultiText.Text = string.Format(Strings.SelectedLineCount, rows.Count);
         _detailSingle.IsVisible = rows.Count == 1;
         _detailSingle.DataContext = rows.Count == 1 ? rows[0] : null;
         _deleteButton.IsEnabled = rows.Count > 0;
@@ -607,35 +603,35 @@ public sealed class KaraokeTabView : UserControl
             AcceptsReturn = true,
             TextWrapping = TextWrapping.Wrap,
             Height = 140,
-            PlaceholderText = "歌詞（LRC も可）",
+            PlaceholderText = Strings.PastePlaceholder,
             [!TextBox.TextProperty] = new Binding("PastedText.Value") { Mode = BindingMode.TwoWay },
         };
-        Button importPasted = TextButton("取り込む", () => ViewModel?.ImportPastedText(), accent: true);
+        Button importPasted = TextButton(Strings.Import, () => ViewModel?.ImportPastedText(), accent: true);
         importPasted.HorizontalAlignment = HorizontalAlignment.Right;
         importPasted[!IsEnabledProperty] = new Binding("PastedText.Value") { Converter = StringConverters.IsNotNullOrEmpty };
 
-        Button file = TextButton("ファイルを選ぶ…", ImportAsync);
+        Button file = TextButton(Strings.ChooseFile, ImportAsync);
         file.HorizontalAlignment = HorizontalAlignment.Left;
-        ToolTip.SetTip(file, "LRC・テキスト");
+        ToolTip.SetTip(file, Strings.LyricsFileTypes);
 
         var mode = new ComboBox
         {
-            ItemsSource = new[] { "置き換える", "追加する" },
+            ItemsSource = new[] { Strings.Replace, Strings.Append },
             MinWidth = 140,
             [!Avalonia.Controls.Primitives.SelectingItemsControl.SelectedIndexProperty] = new Binding("ReplaceOnImport.Value") { Mode = BindingMode.TwoWay, Converter = ReplaceModeConverter.Instance },
         };
 
         Grid sources = Rows();
-        AddRow(sources, 0, "貼り付け", new StackPanel { Spacing = 8, Children = { paste, importPasted } }, alignTop: true);
-        AddRow(sources, 1, "ファイル", file);
-        AddRow(sources, 2, "既存の歌詞", mode);
+        AddRow(sources, 0, Strings.Paste, new StackPanel { Spacing = 8, Children = { paste, importPasted } }, alignTop: true);
+        AddRow(sources, 1, Strings.File, file);
+        AddRow(sources, 2, Strings.ExistingLyrics, mode);
 
         TextBlock notice = Secondary();
         WithResource(notice, TextBlock.ForegroundProperty, "SystemFillColorCriticalBrush");
         notice[!TextBlock.TextProperty] = new Binding("ImportNotice.Value");
         notice[!IsVisibleProperty] = new Binding("ImportNotice.Value") { Converter = StringConverters.IsNotNullOrEmpty };
 
-        TextBlock historyTitle = new() { Text = "履歴", [!IsVisibleProperty] = new Binding("ImportJobs.Count") { Converter = s_isPositive } };
+        TextBlock historyTitle = new() { Text = Strings.History, [!IsVisibleProperty] = new Binding("ImportJobs.Count") { Converter = s_isPositive } };
         var jobs = new ItemsControl
         {
             // Rows draw a separator above themselves; the first one tucks under the group's border.
@@ -646,7 +642,7 @@ public sealed class KaraokeTabView : UserControl
         Border history = Group(jobs, new Thickness(0));
         history[!IsVisibleProperty] = new Binding("ImportJobs.Count") { Converter = s_isPositive };
 
-        return BuildPage("歌詞を取り込む", new StackPanel
+        return BuildPage(Strings.ImportLyrics, new StackPanel
         {
             Spacing = 12,
             Children = { Group(sources), notice, historyTitle, history },
@@ -659,7 +655,7 @@ public sealed class KaraokeTabView : UserControl
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*") };
         TextBlock titleText = BarTitle(title);
         Grid.SetColumn(titleText, 1);
-        row.Children.Add(IconButton(Icon.ArrowLeft, "戻る (Esc)", () => ViewModel?.CloseImportPage()));
+        row.Children.Add(IconButton(Icon.ArrowLeft, Strings.BackShortcut, () => ViewModel?.CloseImportPage()));
         row.Children.Add(titleText);
         Border bar = ToolBar(row);
 
@@ -726,10 +722,10 @@ public sealed class KaraokeTabView : UserControl
         {
             (string label, string key) = job.State switch
             {
-                ImportJobState.Running => ("読み込み中", "SubtleFillColorSecondaryBrush"),
-                ImportJobState.Succeeded => ("完了", "SystemFillColorSuccessBackgroundBrush"),
-                ImportJobState.Failed => ("失敗", "SystemFillColorCriticalBackgroundBrush"),
-                _ => ("中止", "SystemFillColorCautionBackgroundBrush"),
+                ImportJobState.Running => (Strings.JobRunning, "SubtleFillColorSecondaryBrush"),
+                ImportJobState.Succeeded => (Strings.JobSucceeded, "SystemFillColorSuccessBackgroundBrush"),
+                ImportJobState.Failed => (Strings.JobFailed, "SystemFillColorCriticalBackgroundBrush"),
+                _ => (Strings.JobCanceled, "SystemFillColorCautionBackgroundBrush"),
             };
             text.Text = label;
             background?.Dispose();
@@ -754,9 +750,9 @@ public sealed class KaraokeTabView : UserControl
 
         IReadOnlyList<IStorageFile> files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "歌詞ファイルを開く",
+            Title = Strings.OpenLyricsFile,
             AllowMultiple = false,
-            FileTypeFilter = [s_lyricsFiles, FilePickerFileTypes.All],
+            FileTypeFilter = [new FilePickerFileType(Strings.LyricsFiles) { Patterns = ["*.lrc", "*.txt"] }, FilePickerFileTypes.All],
         });
         if (files.Count > 0 && files[0].TryGetLocalPath() is { } path)
             vm.ImportFile(path);
@@ -769,10 +765,10 @@ public sealed class KaraokeTabView : UserControl
 
         IStorageFile? file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "歌詞を書き出す",
+            Title = Strings.ExportLyrics,
             SuggestedFileName = "lyrics.lrc",
             DefaultExtension = "lrc",
-            FileTypeChoices = [new FilePickerFileType("LRC ファイル") { Patterns = ["*.lrc"] }],
+            FileTypeChoices = [new FilePickerFileType(Strings.LrcFiles) { Patterns = ["*.lrc"] }],
         });
         if (file?.TryGetLocalPath() is { } path)
             vm.ExportFile(path);

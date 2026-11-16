@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Beutl.Extensions.Karaoke.Localization;
 
 namespace Beutl.Extensions.Karaoke.Lyrics;
 
@@ -182,13 +183,13 @@ public sealed class KaraokeLyricsJsonConverter : JsonConverter<KaraokeLyrics>
         if (reader.TokenType == JsonTokenType.Null)
             return KaraokeLyrics.Empty;
         if (reader.TokenType != JsonTokenType.StartArray)
-            throw new JsonException("歌詞は LRC の行の配列で書く必要があります。");
+            throw new JsonException(Strings.LyricsArrayRequired);
 
         var lines = new List<string>();
         while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
         {
             if (reader.TokenType != JsonTokenType.String)
-                throw new JsonException("歌詞の行は文字列で書く必要があります。");
+                throw new JsonException(Strings.LyricStringRequired);
             lines.Add(reader.GetString() ?? "");
         }
 

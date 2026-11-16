@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="KaraokeTitle" xml:space="preserve">
+    <value>卡拉 OK 字幕</value>
+  </data>
+  <data name="KaraokeDescription" xml:space="preserve">
+    <value>显示导入的歌词，并随着演唱进度改变颜色。</value>
+  </data>
+  <data name="LyricsEditorName" xml:space="preserve">
+    <value>卡拉 OK 歌词</value>
+  </data>
+  <data name="Lyrics" xml:space="preserve">
+    <value>歌词</value>
+  </data>
+  <data name="LyricsDescription" xml:space="preserve">
+    <value>在“卡拉 OK 字幕”工具选项卡中导入和编辑歌词。</value>
+  </data>
+  <data name="Layout" xml:space="preserve">
+    <value>显示方式</value>
+  </data>
+  <data name="FontFamily" xml:space="preserve">
+    <value>字体</value>
+  </data>
+  <data name="FontWeight" xml:space="preserve">
+    <value>字重</value>
+  </data>
+  <data name="FontSize" xml:space="preserve">
+    <value>字号</value>
+  </data>
+  <data name="LineSpacing" xml:space="preserve">
+    <value>行间距</value>
+  </data>
+  <data name="TextFill" xml:space="preserve">
+    <value>演唱前的文字颜色</value>
+  </data>
+  <data name="TextStroke" xml:space="preserve">
+    <value>演唱前的描边</value>
+  </data>
+  <data name="SungFill" xml:space="preserve">
+    <value>演唱后的文字颜色</value>
+  </data>
+  <data name="SungStroke" xml:space="preserve">
+    <value>演唱后的描边</value>
+  </data>
+  <data name="LeadTime" xml:space="preserve">
+    <value>提前显示时间（秒）</value>
+  </data>
+  <data name="LeadTimeDescription" xml:space="preserve">
+    <value>在开始演唱前提前这段时间显示歌词行。</value>
+  </data>
+  <data name="TailTime" xml:space="preserve">
+    <value>保留时间（秒）</value>
+  </data>
+  <data name="TailTimeDescription" xml:space="preserve">
+    <value>演唱结束后继续显示歌词行的时间。</value>
+  </data>
+  <data name="FadeDuration" xml:space="preserve">
+    <value>淡入淡出时长（秒）</value>
+  </data>
+  <data name="TimeOffset" xml:space="preserve">
+    <value>时间偏移</value>
+  </data>
+  <data name="TimeOffsetDescription" xml:space="preserve">
+    <value>显示时将此偏移量加到歌词时间上。</value>
+  </data>
+  <data name="LayoutSingleLine" xml:space="preserve">
+    <value>单行</value>
+  </data>
+  <data name="LayoutTwoLines" xml:space="preserve">
+    <value>双行交替</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="EditLyricsTip" xml:space="preserve">
+    <value>在“卡拉 OK 字幕”选项卡中导入、编辑歌词并设置时间。</value>
+  </data>
+  <data name="LineCount" xml:space="preserve">
+    <value>{0:N0} 行</value>
+  </data>
+  <data name="DeleteShortcut" xml:space="preserve">
+    <value>删除 (Delete)</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="SelectInTimeline" xml:space="preserve">
+    <value>在时间线中选择</value>
+  </data>
+  <data name="SelectInTimelineDescription" xml:space="preserve">
+    <value>在时间线中选择（{0}）</value>
+  </data>
+  <data name="SelectLine" xml:space="preserve">
+    <value>请选择一行</value>
+  </data>
+  <data name="ExportLrcMenu" xml:space="preserve">
+    <value>导出为 LRC 文件…</value>
+  </data>
+  <data name="DeleteAll" xml:space="preserve">
+    <value>全部删除</value>
+  </data>
+  <data name="More" xml:space="preserve">
+    <value>更多</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>添加</value>
+  </data>
+  <data name="ImportLyrics" xml:space="preserve">
+    <value>导入歌词</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>开始</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>结束</value>
+  </data>
+  <data name="CharacterTiming" xml:space="preserve">
+    <value>逐字时间</value>
+  </data>
+  <data name="ImportEllipsis" xml:space="preserve">
+    <value>导入…</value>
+  </data>
+  <data name="SetToPlayhead" xml:space="preserve">
+    <value>设为播放位置</value>
+  </data>
+  <data name="SeekToTime" xml:space="preserve">
+    <value>跳转到此时间</value>
+  </data>
+  <data name="SungEnd" xml:space="preserve">
+    <value>演唱结束</value>
+  </data>
+  <data name="NotSet" xml:space="preserve">
+    <value>未设置</value>
+  </data>
+  <data name="ClearTiming" xml:space="preserve">
+    <value>清除</value>
+  </data>
+  <data name="TapTiming" xml:space="preserve">
+    <value>点按设置</value>
+  </data>
+  <data name="TapTimingTip" xml:space="preserve">
+    <value>播放时，在每个字词开始演唱时按 T 键。</value>
+  </data>
+  <data name="DistributeEvenly" xml:space="preserve">
+    <value>均匀分配</value>
+  </data>
+  <data name="TapShortcut" xml:space="preserve">
+    <value>点按 (T)</value>
+  </data>
+  <data name="TapStartsPlayback" xml:space="preserve">
+    <value>首次点按时开始播放</value>
+  </data>
+  <data name="TapStartsPlaybackTip" xml:space="preserve">
+    <value>关闭时，请先开始播放，再点按设置时间。</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="SelectedLineCount" xml:space="preserve">
+    <value>已选择 {0:N0} 行</value>
+  </data>
+  <data name="PastePlaceholder" xml:space="preserve">
+    <value>歌词（支持 LRC）</value>
+  </data>
+  <data name="Import" xml:space="preserve">
+    <value>导入</value>
+  </data>
+  <data name="ChooseFile" xml:space="preserve">
+    <value>选择文件…</value>
+  </data>
+  <data name="LyricsFileTypes" xml:space="preserve">
+    <value>LRC 和文本文件</value>
+  </data>
+  <data name="Replace" xml:space="preserve">
+    <value>替换</value>
+  </data>
+  <data name="Append" xml:space="preserve">
+    <value>追加</value>
+  </data>
+  <data name="Paste" xml:space="preserve">
+    <value>粘贴</value>
+  </data>
+  <data name="File" xml:space="preserve">
+    <value>文件</value>
+  </data>
+  <data name="ExistingLyrics" xml:space="preserve">
+    <value>现有歌词</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>历史记录</value>
+  </data>
+  <data name="BackShortcut" xml:space="preserve">
+    <value>返回 (Esc)</value>
+  </data>
+  <data name="JobRunning" xml:space="preserve">
+    <value>正在读取</value>
+  </data>
+  <data name="JobSucceeded" xml:space="preserve">
+    <value>已完成</value>
+  </data>
+  <data name="JobFailed" xml:space="preserve">
+    <value>失败</value>
+  </data>
+  <data name="JobCanceled" xml:space="preserve">
+    <value>已取消</value>
+  </data>
+  <data name="OpenLyricsFile" xml:space="preserve">
+    <value>打开歌词文件</value>
+  </data>
+  <data name="LyricsFiles" xml:space="preserve">
+    <value>歌词文件</value>
+  </data>
+  <data name="ExportLyrics" xml:space="preserve">
+    <value>导出歌词</value>
+  </data>
+  <data name="LrcFiles" xml:space="preserve">
+    <value>LRC 文件</value>
+  </data>
+  <data name="NoTarget" xml:space="preserve">
+    <value>请通过“编辑”按钮打开</value>
+  </data>
+  <data name="MissingTarget" xml:space="preserve">
+    <value>元素已被删除</value>
+  </data>
+  <data name="DefaultLyricText" xml:space="preserve">
+    <value>歌词</value>
+  </data>
+  <data name="UndoAddLine" xml:space="preserve">
+    <value>添加歌词行</value>
+  </data>
+  <data name="UndoDeleteLines" xml:space="preserve">
+    <value>删除歌词行</value>
+  </data>
+  <data name="UndoDeleteAll" xml:space="preserve">
+    <value>删除全部歌词</value>
+  </data>
+  <data name="UndoDistributeTiming" xml:space="preserve">
+    <value>均匀分配逐字时间</value>
+  </data>
+  <data name="UndoClearTiming" xml:space="preserve">
+    <value>清除逐字时间</value>
+  </data>
+  <data name="UndoTapTiming" xml:space="preserve">
+    <value>通过点按设置逐字时间</value>
+  </data>
+  <data name="TapStartPlayback" xml:space="preserve">
+    <value>按 T 开始播放</value>
+  </data>
+  <data name="TapUnitPrompt" xml:space="preserve">
+    <value>在“{0}”开始演唱时点按</value>
+  </data>
+  <data name="TapEndPrompt" xml:space="preserve">
+    <value>在演唱结束时点按</value>
+  </data>
+  <data name="ImportFailed" xml:space="preserve">
+    <value>无法读取文件：{0}</value>
+  </data>
+  <data name="UndoImport" xml:space="preserve">
+    <value>导入歌词</value>
+  </data>
+  <data name="PastedLyrics" xml:space="preserve">
+    <value>粘贴的歌词</value>
+  </data>
+  <data name="UndoPaste" xml:space="preserve">
+    <value>粘贴歌词</value>
+  </data>
+  <data name="ExportedLines" xml:space="preserve">
+    <value>已导出 {0:N0} 行</value>
+  </data>
+  <data name="ExportFailed" xml:space="preserve">
+    <value>无法导出文件：{0}</value>
+  </data>
+  <data name="NoImportTarget" xml:space="preserve">
+    <value>没有可编辑的对象</value>
+  </data>
+  <data name="ReadingLyrics" xml:space="preserve">
+    <value>正在读取…</value>
+  </data>
+  <data name="NoLyricsFound" xml:space="preserve">
+    <value>未找到歌词</value>
+  </data>
+  <data name="ImportedLines" xml:space="preserve">
+    <value>已导入 {0:N0} 行</value>
+  </data>
+  <data name="AppendedLines" xml:space="preserve">
+    <value>已追加 {0:N0} 行</value>
+  </data>
+  <data name="UntimedSpacing" xml:space="preserve">
+    <value>（无时间标记：按 {0:0} 秒间隔排列）</value>
+  </data>
+  <data name="InvalidValueReverted" xml:space="preserve">
+    <value>已还原无效的值</value>
+  </data>
+  <data name="UndoEditLyrics" xml:space="preserve">
+    <value>编辑歌词</value>
+  </data>
+  <data name="UndoEditTiming" xml:space="preserve">
+    <value>编辑逐字时间</value>
+  </data>
+  <data name="TimingClearedAfterTextChange" xml:space="preserve">
+    <value>由于字词分段发生变化，已清除逐字时间</value>
+  </data>
+  <data name="NamedTarget" xml:space="preserve">
+    <value>元素“{0}”</value>
+  </data>
+  <data name="TargetStartingAt" xml:space="preserve">
+    <value>从 {0} 开始的元素</value>
+  </data>
+  <data name="EmptyLyrics" xml:space="preserve">
+    <value>没有歌词</value>
+  </data>
+  <data name="LyricsArrayRequired" xml:space="preserve">
+    <value>歌词必须存储为 LRC 行的数组。</value>
+  </data>
+  <data name="LyricStringRequired" xml:space="preserve">
+    <value>每行歌词必须是字符串。</value>
+  </data>
+</root>

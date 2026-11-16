@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="KaraokeTitle" xml:space="preserve">
+    <value>Subtítulos de karaoke</value>
+  </data>
+  <data name="KaraokeDescription" xml:space="preserve">
+    <value>Muestra las letras importadas y cambia su color al cantarlas.</value>
+  </data>
+  <data name="LyricsEditorName" xml:space="preserve">
+    <value>Letras de karaoke</value>
+  </data>
+  <data name="Lyrics" xml:space="preserve">
+    <value>Letra</value>
+  </data>
+  <data name="LyricsDescription" xml:space="preserve">
+    <value>Importa y edita las letras en la pestaña Subtítulos de karaoke.</value>
+  </data>
+  <data name="Layout" xml:space="preserve">
+    <value>Disposición</value>
+  </data>
+  <data name="FontFamily" xml:space="preserve">
+    <value>Fuente</value>
+  </data>
+  <data name="FontWeight" xml:space="preserve">
+    <value>Grosor</value>
+  </data>
+  <data name="FontSize" xml:space="preserve">
+    <value>Tamaño de letra</value>
+  </data>
+  <data name="LineSpacing" xml:space="preserve">
+    <value>Interlineado</value>
+  </data>
+  <data name="TextFill" xml:space="preserve">
+    <value>Color del texto antes de cantar</value>
+  </data>
+  <data name="TextStroke" xml:space="preserve">
+    <value>Contorno antes de cantar</value>
+  </data>
+  <data name="SungFill" xml:space="preserve">
+    <value>Color del texto después de cantar</value>
+  </data>
+  <data name="SungStroke" xml:space="preserve">
+    <value>Contorno después de cantar</value>
+  </data>
+  <data name="LeadTime" xml:space="preserve">
+    <value>Anticipación (segundos)</value>
+  </data>
+  <data name="LeadTimeDescription" xml:space="preserve">
+    <value>Muestra cada línea este tiempo antes de empezar a cantarla.</value>
+  </data>
+  <data name="TailTime" xml:space="preserve">
+    <value>Permanencia (segundos)</value>
+  </data>
+  <data name="TailTimeDescription" xml:space="preserve">
+    <value>Mantiene cada línea visible este tiempo después de cantarla.</value>
+  </data>
+  <data name="FadeDuration" xml:space="preserve">
+    <value>Duración del fundido (segundos)</value>
+  </data>
+  <data name="TimeOffset" xml:space="preserve">
+    <value>Desfase de tiempo</value>
+  </data>
+  <data name="TimeOffsetDescription" xml:space="preserve">
+    <value>Suma este desfase a los tiempos de las letras al mostrarlas.</value>
+  </data>
+  <data name="LayoutSingleLine" xml:space="preserve">
+    <value>Una línea</value>
+  </data>
+  <data name="LayoutTwoLines" xml:space="preserve">
+    <value>Dos líneas alternas</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Editar</value>
+  </data>
+  <data name="EditLyricsTip" xml:space="preserve">
+    <value>Importa, edita y sincroniza estas letras en la pestaña Subtítulos de karaoke.</value>
+  </data>
+  <data name="LineCount" xml:space="preserve">
+    <value>Líneas: {0:N0}</value>
+  </data>
+  <data name="DeleteShortcut" xml:space="preserve">
+    <value>Eliminar (Delete)</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="SelectInTimeline" xml:space="preserve">
+    <value>Seleccionar en la línea de tiempo</value>
+  </data>
+  <data name="SelectInTimelineDescription" xml:space="preserve">
+    <value>Seleccionar en la línea de tiempo ({0})</value>
+  </data>
+  <data name="SelectLine" xml:space="preserve">
+    <value>Selecciona una línea</value>
+  </data>
+  <data name="ExportLrcMenu" xml:space="preserve">
+    <value>Exportar a un archivo LRC…</value>
+  </data>
+  <data name="DeleteAll" xml:space="preserve">
+    <value>Eliminar todo</value>
+  </data>
+  <data name="More" xml:space="preserve">
+    <value>Más</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Añadir</value>
+  </data>
+  <data name="ImportLyrics" xml:space="preserve">
+    <value>Importar letras</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Inicio</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>Fin</value>
+  </data>
+  <data name="CharacterTiming" xml:space="preserve">
+    <value>Tiempos</value>
+  </data>
+  <data name="ImportEllipsis" xml:space="preserve">
+    <value>Importar…</value>
+  </data>
+  <data name="SetToPlayhead" xml:space="preserve">
+    <value>Usar la posición de reproducción</value>
+  </data>
+  <data name="SeekToTime" xml:space="preserve">
+    <value>Ir a este tiempo</value>
+  </data>
+  <data name="SungEnd" xml:space="preserve">
+    <value>Fin del canto</value>
+  </data>
+  <data name="NotSet" xml:space="preserve">
+    <value>Sin definir</value>
+  </data>
+  <data name="ClearTiming" xml:space="preserve">
+    <value>Borrar</value>
+  </data>
+  <data name="TapTiming" xml:space="preserve">
+    <value>Marcar tiempos</value>
+  </data>
+  <data name="TapTimingTip" xml:space="preserve">
+    <value>Pulsa T al empezar a cantar cada segmento durante la reproducción.</value>
+  </data>
+  <data name="DistributeEvenly" xml:space="preserve">
+    <value>Repartir</value>
+  </data>
+  <data name="TapShortcut" xml:space="preserve">
+    <value>Marcar (T)</value>
+  </data>
+  <data name="TapStartsPlayback" xml:space="preserve">
+    <value>Reproducir con la primera pulsación</value>
+  </data>
+  <data name="TapStartsPlaybackTip" xml:space="preserve">
+    <value>Si está desactivado, inicia la reproducción antes de marcar los tiempos.</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="SelectedLineCount" xml:space="preserve">
+    <value>Líneas seleccionadas: {0:N0}</value>
+  </data>
+  <data name="PastePlaceholder" xml:space="preserve">
+    <value>Letra (también en formato LRC)</value>
+  </data>
+  <data name="Import" xml:space="preserve">
+    <value>Importar</value>
+  </data>
+  <data name="ChooseFile" xml:space="preserve">
+    <value>Elegir archivo…</value>
+  </data>
+  <data name="LyricsFileTypes" xml:space="preserve">
+    <value>Archivos LRC y de texto</value>
+  </data>
+  <data name="Replace" xml:space="preserve">
+    <value>Reemplazar</value>
+  </data>
+  <data name="Append" xml:space="preserve">
+    <value>Añadir</value>
+  </data>
+  <data name="Paste" xml:space="preserve">
+    <value>Pegar</value>
+  </data>
+  <data name="File" xml:space="preserve">
+    <value>Archivo</value>
+  </data>
+  <data name="ExistingLyrics" xml:space="preserve">
+    <value>Letras existentes</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>Historial</value>
+  </data>
+  <data name="BackShortcut" xml:space="preserve">
+    <value>Volver (Esc)</value>
+  </data>
+  <data name="JobRunning" xml:space="preserve">
+    <value>Leyendo</value>
+  </data>
+  <data name="JobSucceeded" xml:space="preserve">
+    <value>Completado</value>
+  </data>
+  <data name="JobFailed" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="JobCanceled" xml:space="preserve">
+    <value>Cancelado</value>
+  </data>
+  <data name="OpenLyricsFile" xml:space="preserve">
+    <value>Abrir archivo de letras</value>
+  </data>
+  <data name="LyricsFiles" xml:space="preserve">
+    <value>Archivos de letras</value>
+  </data>
+  <data name="ExportLyrics" xml:space="preserve">
+    <value>Exportar letras</value>
+  </data>
+  <data name="LrcFiles" xml:space="preserve">
+    <value>Archivos LRC</value>
+  </data>
+  <data name="NoTarget" xml:space="preserve">
+    <value>Abre desde el botón Editar</value>
+  </data>
+  <data name="MissingTarget" xml:space="preserve">
+    <value>Se ha eliminado el elemento</value>
+  </data>
+  <data name="DefaultLyricText" xml:space="preserve">
+    <value>Letra</value>
+  </data>
+  <data name="UndoAddLine" xml:space="preserve">
+    <value>Añadir línea de letra</value>
+  </data>
+  <data name="UndoDeleteLines" xml:space="preserve">
+    <value>Eliminar líneas de letra</value>
+  </data>
+  <data name="UndoDeleteAll" xml:space="preserve">
+    <value>Eliminar todas las letras</value>
+  </data>
+  <data name="UndoDistributeTiming" xml:space="preserve">
+    <value>Repartir los tiempos de la letra</value>
+  </data>
+  <data name="UndoClearTiming" xml:space="preserve">
+    <value>Borrar los tiempos de la letra</value>
+  </data>
+  <data name="UndoTapTiming" xml:space="preserve">
+    <value>Marcar los tiempos de la letra</value>
+  </data>
+  <data name="TapStartPlayback" xml:space="preserve">
+    <value>Pulsa T para reproducir</value>
+  </data>
+  <data name="TapUnitPrompt" xml:space="preserve">
+    <value>Marca cuando empiece «{0}»</value>
+  </data>
+  <data name="TapEndPrompt" xml:space="preserve">
+    <value>Marca cuando termine el canto</value>
+  </data>
+  <data name="ImportFailed" xml:space="preserve">
+    <value>No se pudo leer el archivo: {0}</value>
+  </data>
+  <data name="UndoImport" xml:space="preserve">
+    <value>Importar letras</value>
+  </data>
+  <data name="PastedLyrics" xml:space="preserve">
+    <value>Letras pegadas</value>
+  </data>
+  <data name="UndoPaste" xml:space="preserve">
+    <value>Pegar letras</value>
+  </data>
+  <data name="ExportedLines" xml:space="preserve">
+    <value>Líneas exportadas: {0:N0}</value>
+  </data>
+  <data name="ExportFailed" xml:space="preserve">
+    <value>No se pudo exportar el archivo: {0}</value>
+  </data>
+  <data name="NoImportTarget" xml:space="preserve">
+    <value>No hay ningún objeto para editar</value>
+  </data>
+  <data name="ReadingLyrics" xml:space="preserve">
+    <value>Leyendo…</value>
+  </data>
+  <data name="NoLyricsFound" xml:space="preserve">
+    <value>No se encontraron letras</value>
+  </data>
+  <data name="ImportedLines" xml:space="preserve">
+    <value>Líneas importadas: {0:N0}</value>
+  </data>
+  <data name="AppendedLines" xml:space="preserve">
+    <value>Líneas añadidas: {0:N0}</value>
+  </data>
+  <data name="UntimedSpacing" xml:space="preserve">
+    <value> (sin tiempos: intervalo de {0:0} segundos)</value>
+  </data>
+  <data name="InvalidValueReverted" xml:space="preserve">
+    <value>Se ha revertido un valor no válido</value>
+  </data>
+  <data name="UndoEditLyrics" xml:space="preserve">
+    <value>Editar letras</value>
+  </data>
+  <data name="UndoEditTiming" xml:space="preserve">
+    <value>Editar los tiempos de la letra</value>
+  </data>
+  <data name="TimingClearedAfterTextChange" xml:space="preserve">
+    <value>Se han borrado los tiempos porque cambiaron los segmentos del texto</value>
+  </data>
+  <data name="NamedTarget" xml:space="preserve">
+    <value>Elemento «{0}»</value>
+  </data>
+  <data name="TargetStartingAt" xml:space="preserve">
+    <value>Elemento que empieza en {0}</value>
+  </data>
+  <data name="EmptyLyrics" xml:space="preserve">
+    <value>No hay letras</value>
+  </data>
+  <data name="LyricsArrayRequired" xml:space="preserve">
+    <value>Las letras deben guardarse como una matriz de líneas LRC.</value>
+  </data>
+  <data name="LyricStringRequired" xml:space="preserve">
+    <value>Cada línea de letra debe ser una cadena de texto.</value>
+  </data>
+</root>
