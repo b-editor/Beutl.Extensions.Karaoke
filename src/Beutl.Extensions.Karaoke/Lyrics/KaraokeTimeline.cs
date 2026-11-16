@@ -1,11 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+using Beutl.Extensions.Karaoke.Localization;
+
 namespace Beutl.Extensions.Karaoke.Lyrics;
 
 public enum KaraokeLayout
 {
     /// <summary>One line at a time, centered.</summary>
+    [Display(Name = nameof(Strings.LayoutSingleLine), ResourceType = typeof(Strings))]
     SingleLine,
 
     /// <summary>Two alternating rows, the upper one left-aligned and the lower one right-aligned.</summary>
+    [Display(Name = nameof(Strings.LayoutTwoLines), ResourceType = typeof(Strings))]
     TwoLines,
 }
 

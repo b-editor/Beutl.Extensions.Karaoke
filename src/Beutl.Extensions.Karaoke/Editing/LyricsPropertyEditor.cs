@@ -5,6 +5,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Beutl.Extensibility;
+using Beutl.Extensions.Karaoke.Localization;
 using Beutl.Extensions.Karaoke.Lyrics;
 
 namespace Beutl.Extensions.Karaoke.Editing;
@@ -15,7 +16,7 @@ public sealed class LyricsPropertyEditorExtension : PropertyEditorExtension
 {
     public override string Name => "Karaoke lyrics editor";
 
-    public override string DisplayName => "カラオケ字幕の歌詞";
+    public override string DisplayName => Strings.LyricsEditorName;
 
     protected override void RegisterEditors(PropertyEditorRegistry registry)
     {
@@ -67,7 +68,7 @@ public sealed class LyricsPropertyEditorExtension : PropertyEditorExtension
 
         private readonly Context _context;
         private readonly TextBlock _count = new() { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2, 0, 0, 0) };
-        private readonly Button _edit = new() { Content = "編集", VerticalAlignment = VerticalAlignment.Center };
+        private readonly Button _edit = new() { Content = Strings.Edit, VerticalAlignment = VerticalAlignment.Center };
         private IDisposable? _subscription;
 
         public Summary(Context context)
@@ -87,7 +88,7 @@ public sealed class LyricsPropertyEditorExtension : PropertyEditorExtension
             if (context.Adapter.Description is { Length: > 0 } description)
                 ToolTip.SetTip(header, description);
 
-            ToolTip.SetTip(_edit, "このカラオケ字幕の歌詞を、タブで取り込み・編集・タイミング付けします");
+            ToolTip.SetTip(_edit, Strings.EditLyricsTip);
             _edit.Click += (_, _) =>
             {
                 if (_context.EditorContext is { } editor && _context.Owner is { } drawable)
@@ -130,7 +131,7 @@ public sealed class LyricsPropertyEditorExtension : PropertyEditorExtension
         private sealed class Observer(Summary owner) : IObserver<KaraokeLyrics?>
         {
             public void OnNext(KaraokeLyrics? value) =>
-                Dispatcher.UIThread.Post(() => owner._count.Text = $"{value?.Count ?? 0} 行");
+                Dispatcher.UIThread.Post(() => owner._count.Text = string.Format(Strings.LineCount, value?.Count ?? 0));
 
             public void OnError(Exception error)
             {

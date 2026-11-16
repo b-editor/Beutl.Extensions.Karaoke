@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+  <data name="KaraokeTitle" xml:space="preserve">
+    <value>カラオケ字幕</value>
+  </data>
+  <data name="KaraokeDescription" xml:space="preserve">
+    <value>取り込んだ歌詞を表示し、歌った部分から色を変えます</value>
+  </data>
+  <data name="LyricsEditorName" xml:space="preserve">
+    <value>カラオケ字幕の歌詞</value>
+  </data>
+  <data name="Lyrics" xml:space="preserve">
+    <value>歌詞</value>
+  </data>
+  <data name="LyricsDescription" xml:space="preserve">
+    <value>ツールタブ「カラオケ字幕」で取り込みや編集ができます</value>
+  </data>
+  <data name="Layout" xml:space="preserve">
+    <value>表示方法</value>
+  </data>
+  <data name="FontFamily" xml:space="preserve">
+    <value>フォント</value>
+  </data>
+  <data name="FontWeight" xml:space="preserve">
+    <value>太さ</value>
+  </data>
+  <data name="FontSize" xml:space="preserve">
+    <value>文字の大きさ</value>
+  </data>
+  <data name="LineSpacing" xml:space="preserve">
+    <value>行の間隔</value>
+  </data>
+  <data name="TextFill" xml:space="preserve">
+    <value>歌う前の文字の色</value>
+  </data>
+  <data name="TextStroke" xml:space="preserve">
+    <value>歌う前の縁取り</value>
+  </data>
+  <data name="SungFill" xml:space="preserve">
+    <value>歌った後の文字の色</value>
+  </data>
+  <data name="SungStroke" xml:space="preserve">
+    <value>歌った後の縁取り</value>
+  </data>
+  <data name="LeadTime" xml:space="preserve">
+    <value>先に表示する時間 (秒)</value>
+  </data>
+  <data name="LeadTimeDescription" xml:space="preserve">
+    <value>歌い始めるこの時間前から行を表示します</value>
+  </data>
+  <data name="TailTime" xml:space="preserve">
+    <value>残す時間 (秒)</value>
+  </data>
+  <data name="TailTimeDescription" xml:space="preserve">
+    <value>歌い終わってからこの時間だけ行を残します</value>
+  </data>
+  <data name="FadeDuration" xml:space="preserve">
+    <value>フェードの長さ (秒)</value>
+  </data>
+  <data name="TimeOffset" xml:space="preserve">
+    <value>時刻のずれ</value>
+  </data>
+  <data name="TimeOffsetDescription" xml:space="preserve">
+    <value>歌詞の時刻にこの時間を足して表示します</value>
+  </data>
+  <data name="LayoutSingleLine" xml:space="preserve">
+    <value>1行</value>
+  </data>
+  <data name="LayoutTwoLines" xml:space="preserve">
+    <value>2行（交互）</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>編集</value>
+  </data>
+  <data name="EditLyricsTip" xml:space="preserve">
+    <value>このカラオケ字幕の歌詞を、タブで取り込み・編集・タイミング付けします</value>
+  </data>
+  <data name="LineCount" xml:space="preserve">
+    <value>{0} 行</value>
+  </data>
+  <data name="DeleteShortcut" xml:space="preserve">
+    <value>削除 (Delete)</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="SelectInTimeline" xml:space="preserve">
+    <value>タイムラインで選択</value>
+  </data>
+  <data name="SelectInTimelineDescription" xml:space="preserve">
+    <value>タイムラインで選択（{0}）</value>
+  </data>
+  <data name="SelectLine" xml:space="preserve">
+    <value>行を選択してください</value>
+  </data>
+  <data name="ExportLrcMenu" xml:space="preserve">
+    <value>LRC ファイルに書き出し…</value>
+  </data>
+  <data name="DeleteAll" xml:space="preserve">
+    <value>すべて削除</value>
+  </data>
+  <data name="More" xml:space="preserve">
+    <value>その他</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>追加</value>
+  </data>
+  <data name="ImportLyrics" xml:space="preserve">
+    <value>歌詞を取り込む</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>開始</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>終了</value>
+  </data>
+  <data name="CharacterTiming" xml:space="preserve">
+    <value>文字ごと</value>
+  </data>
+  <data name="ImportEllipsis" xml:space="preserve">
+    <value>取り込む…</value>
+  </data>
+  <data name="SetToPlayhead" xml:space="preserve">
+    <value>再生位置にする</value>
+  </data>
+  <data name="SeekToTime" xml:space="preserve">
+    <value>この時刻へ移動</value>
+  </data>
+  <data name="SungEnd" xml:space="preserve">
+    <value>歌い終わり</value>
+  </data>
+  <data name="NotSet" xml:space="preserve">
+    <value>未設定</value>
+  </data>
+  <data name="ClearTiming" xml:space="preserve">
+    <value>消す</value>
+  </data>
+  <data name="TapTiming" xml:space="preserve">
+    <value>タップで付ける</value>
+  </data>
+  <data name="TapTimingTip" xml:space="preserve">
+    <value>再生しながら、歌い出しごとに T キーで打ちます</value>
+  </data>
+  <data name="DistributeEvenly" xml:space="preserve">
+    <value>均等に割り振る</value>
+  </data>
+  <data name="TapShortcut" xml:space="preserve">
+    <value>打つ (T)</value>
+  </data>
+  <data name="TapStartsPlayback" xml:space="preserve">
+    <value>最初のタップで再生</value>
+  </data>
+  <data name="TapStartsPlaybackTip" xml:space="preserve">
+    <value>オフのときは、再生してから打ちます</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>やめる</value>
+  </data>
+  <data name="SelectedLineCount" xml:space="preserve">
+    <value>{0} 行を選択中</value>
+  </data>
+  <data name="PastePlaceholder" xml:space="preserve">
+    <value>歌詞（LRC も可）</value>
+  </data>
+  <data name="Import" xml:space="preserve">
+    <value>取り込む</value>
+  </data>
+  <data name="ChooseFile" xml:space="preserve">
+    <value>ファイルを選ぶ…</value>
+  </data>
+  <data name="LyricsFileTypes" xml:space="preserve">
+    <value>LRC・テキスト</value>
+  </data>
+  <data name="Replace" xml:space="preserve">
+    <value>置き換える</value>
+  </data>
+  <data name="Append" xml:space="preserve">
+    <value>追加する</value>
+  </data>
+  <data name="Paste" xml:space="preserve">
+    <value>貼り付け</value>
+  </data>
+  <data name="File" xml:space="preserve">
+    <value>ファイル</value>
+  </data>
+  <data name="ExistingLyrics" xml:space="preserve">
+    <value>既存の歌詞</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>履歴</value>
+  </data>
+  <data name="BackShortcut" xml:space="preserve">
+    <value>戻る (Esc)</value>
+  </data>
+  <data name="JobRunning" xml:space="preserve">
+    <value>読み込み中</value>
+  </data>
+  <data name="JobSucceeded" xml:space="preserve">
+    <value>完了</value>
+  </data>
+  <data name="JobFailed" xml:space="preserve">
+    <value>失敗</value>
+  </data>
+  <data name="JobCanceled" xml:space="preserve">
+    <value>中止</value>
+  </data>
+  <data name="OpenLyricsFile" xml:space="preserve">
+    <value>歌詞ファイルを開く</value>
+  </data>
+  <data name="LyricsFiles" xml:space="preserve">
+    <value>歌詞ファイル</value>
+  </data>
+  <data name="ExportLyrics" xml:space="preserve">
+    <value>歌詞を書き出す</value>
+  </data>
+  <data name="LrcFiles" xml:space="preserve">
+    <value>LRC ファイル</value>
+  </data>
+  <data name="NoTarget" xml:space="preserve">
+    <value>「編集」から開いてください</value>
+  </data>
+  <data name="MissingTarget" xml:space="preserve">
+    <value>要素が削除されました</value>
+  </data>
+  <data name="DefaultLyricText" xml:space="preserve">
+    <value>歌詞</value>
+  </data>
+  <data name="UndoAddLine" xml:space="preserve">
+    <value>歌詞の行を追加</value>
+  </data>
+  <data name="UndoDeleteLines" xml:space="preserve">
+    <value>歌詞の行を削除</value>
+  </data>
+  <data name="UndoDeleteAll" xml:space="preserve">
+    <value>歌詞をすべて削除</value>
+  </data>
+  <data name="UndoDistributeTiming" xml:space="preserve">
+    <value>文字ごとの時刻を均等に設定</value>
+  </data>
+  <data name="UndoClearTiming" xml:space="preserve">
+    <value>文字ごとの時刻を削除</value>
+  </data>
+  <data name="UndoTapTiming" xml:space="preserve">
+    <value>文字ごとの時刻をタップで設定</value>
+  </data>
+  <data name="TapStartPlayback" xml:space="preserve">
+    <value>T で再生を開始</value>
+  </data>
+  <data name="TapUnitPrompt" xml:space="preserve">
+    <value>「{0}」の歌い出しで打つ</value>
+  </data>
+  <data name="TapEndPrompt" xml:space="preserve">
+    <value>歌い終わりで打つ</value>
+  </data>
+  <data name="ImportFailed" xml:space="preserve">
+    <value>読み込めませんでした: {0}</value>
+  </data>
+  <data name="UndoImport" xml:space="preserve">
+    <value>歌詞を取り込み</value>
+  </data>
+  <data name="PastedLyrics" xml:space="preserve">
+    <value>貼り付けた歌詞</value>
+  </data>
+  <data name="UndoPaste" xml:space="preserve">
+    <value>歌詞を貼り付け</value>
+  </data>
+  <data name="ExportedLines" xml:space="preserve">
+    <value>{0:N0} 行を書き出しました</value>
+  </data>
+  <data name="ExportFailed" xml:space="preserve">
+    <value>書き出せませんでした: {0}</value>
+  </data>
+  <data name="NoImportTarget" xml:space="preserve">
+    <value>編集する対象がありません</value>
+  </data>
+  <data name="ReadingLyrics" xml:space="preserve">
+    <value>読み込み中…</value>
+  </data>
+  <data name="NoLyricsFound" xml:space="preserve">
+    <value>歌詞が見つかりませんでした</value>
+  </data>
+  <data name="ImportedLines" xml:space="preserve">
+    <value>{0:N0} 行を取り込みました</value>
+  </data>
+  <data name="AppendedLines" xml:space="preserve">
+    <value>{0:N0} 行を追加しました</value>
+  </data>
+  <data name="UntimedSpacing" xml:space="preserve">
+    <value>（時刻なし: {0:0} 秒間隔で配置）</value>
+  </data>
+  <data name="InvalidValueReverted" xml:space="preserve">
+    <value>読み取れない値を元に戻しました</value>
+  </data>
+  <data name="UndoEditLyrics" xml:space="preserve">
+    <value>歌詞を編集</value>
+  </data>
+  <data name="UndoEditTiming" xml:space="preserve">
+    <value>文字ごとの時刻を編集</value>
+  </data>
+  <data name="TimingClearedAfterTextChange" xml:space="preserve">
+    <value>区切りが変わったため、文字ごとの時刻を消しました</value>
+  </data>
+  <data name="NamedTarget" xml:space="preserve">
+    <value>要素「{0}」</value>
+  </data>
+  <data name="TargetStartingAt" xml:space="preserve">
+    <value>{0} から始まる要素</value>
+  </data>
+  <data name="EmptyLyrics" xml:space="preserve">
+    <value>歌詞がありません</value>
+  </data>
+  <data name="LyricsArrayRequired" xml:space="preserve">
+    <value>歌詞は LRC の行の配列で書く必要があります。</value>
+  </data>
+  <data name="LyricStringRequired" xml:space="preserve">
+    <value>歌詞の行は文字列で書く必要があります。</value>
+  </data>
+</root>

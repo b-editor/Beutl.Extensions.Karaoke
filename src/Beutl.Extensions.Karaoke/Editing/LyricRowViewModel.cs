@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Beutl.Extensions.Karaoke.Localization;
 using Beutl.Extensions.Karaoke.Lyrics;
 
 namespace Beutl.Extensions.Karaoke.Editing;
@@ -58,7 +59,7 @@ public sealed class LyricRowViewModel : INotifyPropertyChanged
 
     public bool HasWordTiming => Line.HasWordTiming;
 
-    public string TimingName => Line.HasWordTiming ? "文字ごと" : "—";
+    public string TimingName => Line.HasWordTiming ? Strings.CharacterTiming : "—";
 
     internal bool IsLoading => _loading;
 

@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Collections.ObjectModel;
 using System.Text.Json.Nodes;
 using Avalonia.Threading;
@@ -7,6 +6,7 @@ using Beutl.Editor.Services;
 using Beutl.Engine;
 using Beutl.Extensibility;
 using Beutl.Extensions.Karaoke.Graphics;
+using Beutl.Extensions.Karaoke.Localization;
 using Beutl.Extensions.Karaoke.Lyrics;
 using Beutl.ProjectSystem;
 using Reactive.Bindings;
@@ -20,10 +20,6 @@ namespace Beutl.Extensions.Karaoke.Editing;
 /// </summary>
 public sealed class KaraokeTabViewModel : IToolContext
 {
-    private const string NoTargetMessage = "「編集」から開いてください";
-
-    private const string MissingTargetMessage = "要素が削除されました";
-
     private static readonly TimeSpan s_newLineLength = TimeSpan.FromSeconds(4);
 
     private readonly IServiceProvider _services;
@@ -88,7 +84,7 @@ public sealed class KaraokeTabViewModel : IToolContext
 
     public IReactiveProperty<bool> IsSelected { get; } = new ReactivePropertySlim<bool>();
 
-    public IReadOnlyReactiveProperty<string> Header { get; } = new ReactivePropertySlim<string>("カラオケ字幕");
+    public IReadOnlyReactiveProperty<string> Header { get; } = new ReactivePropertySlim<string>(Strings.KaraokeTitle);
 
     /// <summary>Whether the tab shows the import page instead of the editor.</summary>
     public ReactivePropertySlim<bool> IsImportPageOpen { get; } = new();
@@ -100,7 +96,7 @@ public sealed class KaraokeTabViewModel : IToolContext
     public ObservableCollection<ImportJobViewModel> ImportJobs { get; } = [];
 
     /// <summary>Why nothing is being edited, or null while <see cref="Target"/> is set.</summary>
-    public ReactivePropertySlim<string?> TargetMessage { get; } = new(NoTargetMessage);
+    public ReactivePropertySlim<string?> TargetMessage { get; } = new(Strings.NoTarget);
 
     /// <summary>Which element is being edited, for the header.</summary>
     public ReactivePropertySlim<string> TargetDescription { get; } = new("");
@@ -193,8 +189,8 @@ public sealed class KaraokeTabViewModel : IToolContext
             return;
 
         TimeSpan start = Playhead() ?? TimeSpan.Zero;
-        var line = new LyricLine(start, start + s_newLineLength, "歌詞", [new LyricWord(0, 2, start, start + s_newLineLength)], false);
-        Commit(CurrentLyrics.Add(line), "歌詞の行を追加");
+        var line = Untimed(start, start + s_newLineLength, Strings.DefaultLyricText);
+        Commit(CurrentLyrics.Add(line), Strings.UndoAddLine);
         RequestFocus(start, line.Text);
     }
 
@@ -202,13 +198,13 @@ public sealed class KaraokeTabViewModel : IToolContext
     {
         int[] indices = rows.Select(r => r.Index).ToArray();
         if (Target.Value != null && indices.Length > 0)
-            Commit(CurrentLyrics.RemoveAt(indices), "歌詞の行を削除");
+            Commit(CurrentLyrics.RemoveAt(indices), Strings.UndoDeleteLines);
     }
 
     public void ClearAll()
     {
         if (Target.Value != null && CurrentLyrics.Count > 0)
-            Commit(KaraokeLyrics.Empty, "歌詞をすべて削除");
+            Commit(KaraokeLyrics.Empty, Strings.UndoDeleteAll);
     }
 
     /// <summary>Moves the playhead to where the line starts on the timeline.</summary>
@@ -247,14 +243,14 @@ public sealed class KaraokeTabViewModel : IToolContext
             u.Start, u.Length,
             line.Start + TimeSpan.FromMilliseconds(Math.Round(step * i)),
             line.Start + TimeSpan.FromMilliseconds(Math.Round(step * (i + 1))))).ToList();
-        ReplaceLine(row, line with { Words = words, HasWordTiming = true }, "文字ごとの時刻を均等に設定");
+        ReplaceLine(row, line with { Words = words, HasWordTiming = true }, Strings.UndoDistributeTiming);
     }
 
     public void ClearWordTiming(LyricRowViewModel row)
     {
         LyricLine line = row.Line;
         if (line.HasWordTiming)
-            ReplaceLine(row, Untimed(line.Start, line.End, line.Text), "文字ごとの時刻を削除");
+            ReplaceLine(row, Untimed(line.Start, line.End, line.Text), Strings.UndoClearTiming);
     }
 
     /// <summary>
@@ -306,7 +302,7 @@ public sealed class KaraokeTabViewModel : IToolContext
         TimeSpan start = _tapTimes[0];
         TimeSpan end = line.End > _tapTimes[^1] ? line.End : _tapTimes[^1];
         CancelTapping();
-        ReplaceLine(row, new LyricLine(start, end, line.Text, words, true), "文字ごとの時刻をタップで設定");
+        ReplaceLine(row, new LyricLine(start, end, line.Text, words, true), Strings.UndoTapTiming);
     }
 
     public void CancelTapping()
@@ -340,11 +336,11 @@ public sealed class KaraokeTabViewModel : IToolContext
             ? new TapProgress(text, _tapUnits[next].Start, _tapUnits[next].Length, next, _tapUnits.Count)
             : new TapProgress(text, text.Length, 0, next, _tapUnits.Count);
         if (WaitsForPlayback)
-            TapPrompt.Value = "T で再生を開始";
+            TapPrompt.Value = Strings.TapStartPlayback;
         else
             TapPrompt.Value = next < _tapUnits.Count
-                ? $"「{text.Substring(_tapUnits[next].Start, _tapUnits[next].Length).Trim()}」の歌い出しで打つ"
-                : "歌い終わりで打つ";
+                ? string.Format(Strings.TapUnitPrompt, text.Substring(_tapUnits[next].Start, _tapUnits[next].Length).Trim())
+                : Strings.TapEndPrompt;
     }
 
     private void OnPlayingChanged(bool playing)
@@ -416,7 +412,7 @@ public sealed class KaraokeTabViewModel : IToolContext
     /// <summary>Imports an LRC or text file into the edited object.</summary>
     public void ImportFile(string path)
     {
-        if (StartJob(Path.GetFileName(path), "ファイル") is not { } job)
+        if (StartJob(Path.GetFileName(path), Strings.File) is not { } job)
             return;
 
         List<LyricLine> lines;
@@ -427,20 +423,20 @@ public sealed class KaraokeTabViewModel : IToolContext
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            Fail(job, $"読み込めませんでした: {ex.Message}");
+            Fail(job, string.Format(Strings.ImportFailed, ex.Message));
             return;
         }
 
-        Import(lines, timed, "歌詞を取り込み", job);
+        Import(lines, timed, Strings.UndoImport, job);
     }
 
     public void ImportPastedText()
     {
-        if (StartJob("貼り付けた歌詞", "貼り付け") is not { } job)
+        if (StartJob(Strings.PastedLyrics, Strings.Paste) is not { } job)
             return;
 
         List<LyricLine> lines = LyricsImport.Parse(PastedText.Value, out bool timed);
-        if (Import(lines, timed, "歌詞を貼り付け", job))
+        if (Import(lines, timed, Strings.UndoPaste, job))
             PastedText.Value = "";
     }
 
@@ -450,11 +446,11 @@ public sealed class KaraokeTabViewModel : IToolContext
         {
             // Plain UTF-8: some LRC players misread a byte order mark as part of the first tag.
             File.WriteAllText(path, LrcWriter.ToLrc(CurrentLyrics.Lines), new System.Text.UTF8Encoding(false));
-            Status.Value = $"{CurrentLyrics.Count:N0} 行を書き出しました";
+            Status.Value = string.Format(Strings.ExportedLines, CurrentLyrics.Count);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            Status.Value = $"書き出せませんでした: {ex.Message}";
+            Status.Value = string.Format(Strings.ExportFailed, ex.Message);
         }
     }
 
@@ -462,12 +458,12 @@ public sealed class KaraokeTabViewModel : IToolContext
     {
         if (Target.Value == null)
         {
-            Status.Value = ImportNotice.Value = "編集する対象がありません";
+            Status.Value = ImportNotice.Value = Strings.NoImportTarget;
             return null;
         }
 
         ImportNotice.Value = null;
-        var job = new ImportJobViewModel(title, source, "読み込み中…");
+        var job = new ImportJobViewModel(title, source, Strings.ReadingLyrics);
         ImportJobs.Insert(0, job);
         return job;
     }
@@ -476,7 +472,7 @@ public sealed class KaraokeTabViewModel : IToolContext
     {
         if (lines.Count == 0)
         {
-            Fail(job, "歌詞が見つかりませんでした");
+            Fail(job, Strings.NoLyricsFound);
             return false;
         }
 
@@ -493,10 +489,9 @@ public sealed class KaraokeTabViewModel : IToolContext
             Commit(next, commandName);
 
         // The result goes to the history entry, and to the status line the editor shows.
-        string message = string.Create(CultureInfo.InvariantCulture,
-            $"{lines.Count:N0} 行を{(ReplaceOnImport.Value ? "取り込みました" : "追加しました")}");
+        string message = string.Format(ReplaceOnImport.Value ? Strings.ImportedLines : Strings.AppendedLines, lines.Count);
         if (!timed)
-            message += $"（時刻なし: {LyricsImport.PlainLineSpacing.TotalSeconds:0} 秒間隔で配置）";
+            message += string.Format(Strings.UntimedSpacing, LyricsImport.PlainLineSpacing.TotalSeconds);
         job.Finish(ImportJobState.Succeeded, message);
         Status.Value = message;
         return true;
@@ -527,12 +522,12 @@ public sealed class KaraokeTabViewModel : IToolContext
 
         if (updated == null)
         {
-            Status.Value = "読み取れない値を元に戻しました";
+            Status.Value = Strings.InvalidValueReverted;
             row.Load(row.Index, old);
             return;
         }
 
-        ReplaceLine(row, updated, "歌詞を編集");
+        ReplaceLine(row, updated, Strings.UndoEditLyrics);
     }
 
     internal void OnSegmentEdited(LyricRowViewModel row, LyricSegmentViewModel segment)
@@ -543,7 +538,7 @@ public sealed class KaraokeTabViewModel : IToolContext
         LyricLine old = CurrentLyrics.Lines[row.Index];
         if (!old.HasWordTiming || segment.Index >= old.Words.Count || !LrcWriter.TryParseTime(segment.TimeText, out TimeSpan time))
         {
-            Status.Value = "読み取れない値を元に戻しました";
+            Status.Value = Strings.InvalidValueReverted;
             row.Load(row.Index, old);
             return;
         }
@@ -557,7 +552,7 @@ public sealed class KaraokeTabViewModel : IToolContext
         words[k] = words[k] with { Start = time };
         if (k > 0)
             words[k - 1] = words[k - 1] with { End = time };
-        ReplaceLine(row, old with { Words = words }, "文字ごとの時刻を編集");
+        ReplaceLine(row, old with { Words = words }, Strings.UndoEditTiming);
     }
 
     private static LyricLine? WithStart(LyricLine old, string text)
@@ -603,7 +598,7 @@ public sealed class KaraokeTabViewModel : IToolContext
             return new LyricLine(old.Start, old.End, text, words, true);
         }
 
-        Status.Value = "区切りが変わったため、文字ごとの時刻を消しました";
+        Status.Value = Strings.TimingClearedAfterTextChange;
         return Untimed(old.Start, old.End, text);
     }
 
@@ -678,7 +673,7 @@ public sealed class KaraokeTabViewModel : IToolContext
                        && _scene.Children.Contains(_boundElement)
                        && ReferenceEquals(_bound.FindHierarchicalParent<Element>(), _boundElement);
         ApplyTarget(present ? _bound : null, present ? _boundElement : null);
-        TargetMessage.Value = present ? null : _bound == null ? NoTargetMessage : MissingTargetMessage;
+        TargetMessage.Value = present ? null : _bound == null ? Strings.NoTarget : Strings.MissingTarget;
         if (!present)
             IsImportPageOpen.Value = false;
     }
@@ -701,8 +696,8 @@ public sealed class KaraokeTabViewModel : IToolContext
         }
 
         TargetDescription.Value = element == null ? ""
-            : !string.IsNullOrWhiteSpace(element.Name.Value) ? $"要素「{element.Name.Value}」"
-            : $"{LrcWriter.FormatTime(element.Start.Value.ToTimeSpan())} から始まる要素";
+            : !string.IsNullOrWhiteSpace(element.Name.Value) ? string.Format(Strings.NamedTarget, element.Name.Value)
+            : string.Format(Strings.TargetStartingAt, LrcWriter.FormatTime(element.Start.Value.ToTimeSpan()));
     }
 
     private void OnLyricsChanged(object? sender, PropertyValueChangedEventArgs<KaraokeLyrics> e)
@@ -746,7 +741,7 @@ public sealed class KaraokeTabViewModel : IToolContext
         TotalCount.Value = _allRows.Count;
         EmptyMessage.Value = Target.Value == null || _allRows.Count > 0
             ? null
-            : "歌詞がありません";
+            : Strings.EmptyLyrics;
     }
 
     public void WriteToJson(JsonObject json)

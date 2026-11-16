@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Beutl.Composition;
 using Beutl.Engine;
+using Beutl.Extensions.Karaoke.Localization;
 using Beutl.Extensions.Karaoke.Lyrics;
 using Beutl.Graphics;
 using Beutl.Graphics.Rendering;
@@ -14,7 +15,7 @@ namespace Beutl.Extensions.Karaoke.Graphics;
 /// and edited in the "カラオケ字幕" tool tab. Lyric times are measured from the start of the object.
 /// </summary>
 /// <remarks>The original duration lasts until the last line has left the screen.</remarks>
-[Display(Name = "カラオケ字幕")]
+[Display(Name = nameof(Strings.KaraokeTitle), ResourceType = typeof(Strings))]
 public sealed partial class KaraokeDrawable : Drawable, IOriginalDurationProvider, ISplittable
 {
     public KaraokeDrawable()
@@ -27,50 +28,50 @@ public sealed partial class KaraokeDrawable : Drawable, IOriginalDurationProvide
         SungStroke.Value = CreatePen(Colors.White, 8);
     }
 
-    [Display(Name = "歌詞", Description = "ツールタブ「カラオケ字幕」で取り込みや編集ができます")]
+    [Display(Name = nameof(Strings.Lyrics), Description = nameof(Strings.LyricsDescription), ResourceType = typeof(Strings))]
     public IExpressionProperty<KaraokeLyrics> Lyrics { get; } = Property.CreateExpression(KaraokeLyrics.Empty);
 
-    [Display(Name = "表示方法")]
+    [Display(Name = nameof(Strings.Layout), ResourceType = typeof(Strings))]
     public IExpressionProperty<KaraokeLayout> Layout { get; } = Property.CreateExpression(KaraokeLayout.TwoLines);
 
-    [Display(Name = "フォント")]
+    [Display(Name = nameof(Strings.FontFamily), ResourceType = typeof(Strings))]
     public IExpressionProperty<FontFamily?> FontFamily { get; } = Property.CreateExpression<FontFamily?>(DefaultFont());
 
-    [Display(Name = "太さ")]
+    [Display(Name = nameof(Strings.FontWeight), ResourceType = typeof(Strings))]
     public IExpressionProperty<FontWeight> FontWeight { get; } = Property.CreateExpression(Media.FontWeight.Bold);
 
     [Range(1f, 1000f)]
-    [Display(Name = "文字の大きさ")]
+    [Display(Name = nameof(Strings.FontSize), ResourceType = typeof(Strings))]
     public IExpressionProperty<float> FontSize { get; } = Property.CreateExpression(64f);
 
-    [Display(Name = "行の間隔")]
+    [Display(Name = nameof(Strings.LineSpacing), ResourceType = typeof(Strings))]
     public IExpressionProperty<float> LineSpacing { get; } = Property.CreateExpression(16f);
 
-    [Display(Name = "歌う前の文字の色")]
+    [Display(Name = nameof(Strings.TextFill), ResourceType = typeof(Strings))]
     public IExpressionProperty<Brush?> TextFill { get; } = Property.CreateExpression<Brush?>();
 
-    [Display(Name = "歌う前の縁取り")]
+    [Display(Name = nameof(Strings.TextStroke), ResourceType = typeof(Strings))]
     public IExpressionProperty<Pen?> TextStroke { get; } = Property.CreateExpression<Pen?>();
 
-    [Display(Name = "歌った後の文字の色")]
+    [Display(Name = nameof(Strings.SungFill), ResourceType = typeof(Strings))]
     public IExpressionProperty<Brush?> SungFill { get; } = Property.CreateExpression<Brush?>();
 
-    [Display(Name = "歌った後の縁取り")]
+    [Display(Name = nameof(Strings.SungStroke), ResourceType = typeof(Strings))]
     public IExpressionProperty<Pen?> SungStroke { get; } = Property.CreateExpression<Pen?>();
 
     [Range(0f, 10f)]
-    [Display(Name = "先に表示する時間 (秒)", Description = "歌い始めるこの時間前から行を表示します")]
+    [Display(Name = nameof(Strings.LeadTime), Description = nameof(Strings.LeadTimeDescription), ResourceType = typeof(Strings))]
     public IExpressionProperty<float> LeadTime { get; } = Property.CreateExpression(1.5f);
 
     [Range(0f, 10f)]
-    [Display(Name = "残す時間 (秒)", Description = "歌い終わってからこの時間だけ行を残します")]
+    [Display(Name = nameof(Strings.TailTime), Description = nameof(Strings.TailTimeDescription), ResourceType = typeof(Strings))]
     public IExpressionProperty<float> TailTime { get; } = Property.CreateExpression(0.8f);
 
     [Range(0f, 2f)]
-    [Display(Name = "フェードの長さ (秒)")]
+    [Display(Name = nameof(Strings.FadeDuration), ResourceType = typeof(Strings))]
     public IExpressionProperty<float> FadeDuration { get; } = Property.CreateExpression(0.2f);
 
-    [Display(Name = "時刻のずれ", Description = "歌詞の時刻にこの時間を足して表示します")]
+    [Display(Name = nameof(Strings.TimeOffset), Description = nameof(Strings.TimeOffsetDescription), ResourceType = typeof(Strings))]
     public IExpressionProperty<MediaTime> TimeOffset { get; } = Property.CreateExpression(MediaTime.Zero);
 
     private static FontFamily DefaultFont()
