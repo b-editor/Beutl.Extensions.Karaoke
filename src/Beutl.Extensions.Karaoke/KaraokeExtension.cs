@@ -1,7 +1,9 @@
 using Beutl.Extensibility;
 using Beutl.Extensions.Karaoke.Graphics;
 using Beutl.Extensions.Karaoke.Localization;
+using Beutl.Media;
 using Beutl.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Beutl.Extensions.Karaoke;
 
@@ -12,10 +14,11 @@ public sealed class KaraokeExtension : Extension
 
     public override string DisplayName => Strings.KaraokeTitle;
 
-    public override void Load()
+    public override void Load(IExtensionContext context)
     {
-        base.Load();
-        LibraryService.Current.RegisterGroup(Strings.KaraokeTitle, g => g
+        base.Load(context);
+        KaraokeDrawable.HostFonts = context.Services.GetService<FontManager>();
+        context.Services.GetRequiredService<LibraryService>().RegisterGroup(Strings.KaraokeTitle, g => g
             // BindDrawable also binds the EngineObject format, which the timeline requires to accept a drop.
             .AddMultiple(Strings.KaraokeTitle, Strings.KaraokeDescription, m => m.BindDrawable<KaraokeDrawable>()));
     }

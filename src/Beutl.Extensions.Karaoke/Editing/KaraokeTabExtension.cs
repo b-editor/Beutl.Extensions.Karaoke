@@ -23,17 +23,17 @@ public sealed class KaraokeTabExtension : ToolTabExtension
     // The line list is wide, so it sits under the timeline like the other list-style tools.
     public override DockAnchor DefaultAnchor => DockAnchor.Bottom;
 
-    public override void Load()
+    public override void Load(IExtensionContext context)
     {
-        base.Load();
+        base.Load(context);
         s_loaded = this;
     }
 
-    public override void Unload()
+    public override void Unload(IExtensionContext context)
     {
         if (ReferenceEquals(s_loaded, this))
             s_loaded = null;
-        base.Unload();
+        base.Unload(context);
     }
 
     /// <summary>

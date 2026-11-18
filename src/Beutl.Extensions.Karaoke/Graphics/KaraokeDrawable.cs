@@ -74,10 +74,13 @@ public sealed partial class KaraokeDrawable : Drawable, IOriginalDurationProvide
     [Display(Name = nameof(Strings.TimeOffset), Description = nameof(Strings.TimeOffsetDescription), ResourceType = typeof(Strings))]
     public IExpressionProperty<MediaTime> TimeOffset { get; } = Property.CreateExpression(MediaTime.Zero);
 
+    // The host's fonts, set when the extension loads; a new object uses Noto Sans JP when the host has it.
+    internal static FontManager? HostFonts { get; set; }
+
     private static FontFamily DefaultFont()
     {
         var notoSansJp = new FontFamily("Noto Sans JP");
-        return FontManager.Instance.IsRegistered(notoSansJp) ? notoSansJp : Media.FontFamily.Default;
+        return HostFonts?.IsRegistered(notoSansJp) == true ? notoSansJp : Media.FontFamily.Default;
     }
 
     private static Pen CreatePen(Color color, float thickness)
@@ -123,6 +126,7 @@ public sealed partial class KaraokeDrawable : Drawable, IOriginalDurationProvide
     public partial class Resource
     {
         private LyricsLayout? _textLayout;
+        private FontManager? _fonts;
         private LyricsDocument? _scheduledDocument;
         private (KaraokeLayout, float, float) _scheduleKey;
         private KaraokeLyrics? _documentLyrics;
@@ -195,6 +199,13 @@ public sealed partial class KaraokeDrawable : Drawable, IOriginalDurationProvide
 
         partial void PostReconcile(KaraokeDrawable obj, CompositionContext context)
         {
+            // The text is shaped with the fonts of the renderer that reconciles this resource.
+            if (!ReferenceEquals(_fonts, context.Fonts))
+            {
+                _fonts = context.Fonts;
+                Version++;
+            }
+
             UpdateDocument();
             TimeSpan time = (context.Time - obj.TimeRange.Value.Start - TimeOffset).ToTimeSpan();
             if (time != LyricTime)
@@ -239,9 +250,10 @@ public sealed partial class KaraokeDrawable : Drawable, IOriginalDurationProvide
             if (Document is not { Lines.Count: > 0 } document)
                 return null;
 
+            FontManager fonts = _fonts ?? throw new InvalidOperationException("Text layout requires CompositionContext.Fonts.");
             FontFamily font = FontFamily ?? Media.FontFamily.Default;
-            if (_textLayout == null || !_textLayout.Matches(document.Lines, font, FontSize, FontWeight))
-                _textLayout = new LyricsLayout(document.Lines, font, FontSize, FontWeight);
+            if (_textLayout == null || !_textLayout.Matches(document.Lines, fonts, font, FontSize, FontWeight))
+                _textLayout = new LyricsLayout(fonts, document.Lines, font, FontSize, FontWeight);
 
             return _textLayout;
         }
