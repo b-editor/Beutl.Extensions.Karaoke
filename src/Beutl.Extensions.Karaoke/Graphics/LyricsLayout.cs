@@ -13,13 +13,15 @@ namespace Beutl.Extensions.Karaoke.Graphics;
 /// </remarks>
 internal sealed class LyricsLayout
 {
+    private readonly FontManager _fonts;
     private readonly IReadOnlyList<LyricLine> _lines;
     private readonly FontFamily _font;
     private readonly float _size;
     private readonly FontWeight _weight;
 
-    public LyricsLayout(IReadOnlyList<LyricLine> lines, FontFamily font, float size, FontWeight weight)
+    public LyricsLayout(FontManager fonts, IReadOnlyList<LyricLine> lines, FontFamily font, float size, FontWeight weight)
     {
+        _fonts = fonts;
         _lines = lines;
         _font = font;
         _size = size;
@@ -76,9 +78,9 @@ internal sealed class LyricsLayout
 
     public float LineHeight => Descent - Ascent;
 
-    public bool Matches(IReadOnlyList<LyricLine> lines, FontFamily font, float size, FontWeight weight)
+    public bool Matches(IReadOnlyList<LyricLine> lines, FontManager fonts, FontFamily font, float size, FontWeight weight)
     {
-        return ReferenceEquals(lines, _lines) && font.Equals(_font) && size == _size && weight == _weight;
+        return ReferenceEquals(lines, _lines) && ReferenceEquals(fonts, _fonts) && font.Equals(_font) && size == _size && weight == _weight;
     }
 
     /// <summary>The x position of a fractional character position.</summary>
@@ -97,7 +99,7 @@ internal sealed class LyricsLayout
 
     private FormattedText Create(string text, int length)
     {
-        return new FormattedText
+        return new FormattedText(_fonts)
         {
             Font = _font,
             Size = Math.Max(1, _size),
