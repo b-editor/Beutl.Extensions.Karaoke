@@ -6,6 +6,7 @@ using Beutl.Extensions.Karaoke.Lyrics;
 using Beutl.Graphics;
 using Beutl.Graphics.Rendering;
 using Beutl.Media;
+using Beutl.Media.Decoding;
 using Beutl.Media.TextFormatting;
 
 namespace Beutl.Extensions.Karaoke.Graphics;
@@ -98,7 +99,8 @@ public sealed partial class KaraokeDrawable : Drawable, IOriginalDurationProvide
         return Lyrics.Value.Count > 0;
     }
 
-    public bool TryGetOriginalDuration(out MediaTime timeSpan)
+    // The lyrics set the duration; there is no media for the decoders to open.
+    public bool TryGetOriginalDuration(out MediaTime timeSpan, DecoderRegistry? decoders = null)
     {
         timeSpan = MediaTime.Zero;
         KaraokeLyrics lyrics = Lyrics.Value;
