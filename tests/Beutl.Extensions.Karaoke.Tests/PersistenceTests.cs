@@ -59,7 +59,7 @@ public class PersistenceTests
 
             CoreSerializer.StoreToUri(element, uri);
             var json = JsonNode.Parse(File.ReadAllText(uri.LocalPath))!;
-            Assert.That(json["minAppVersion"]!.GetValue<string>(), Is.EqualTo("2.0.0-preview.11"));
+            Assert.That(json["minAppVersion"]!.GetValue<string>(), Is.EqualTo("2.0.0-preview.15"));
             Assert.That(json["Start"]!.GetValue<long>(), Is.EqualTo(element.Start.Value.Flicks));
             Assert.That(json["Objects"]![0]!["TimeOffset"]!.GetValue<long>(), Is.EqualTo(drawable.TimeOffset.Value.Flicks));
             Assert.That(json["Objects"]![0]!["Lyrics"]!.AsArray().All(line => line is JsonValue value && value.TryGetValue<string>(out _)), Is.True);
@@ -132,7 +132,7 @@ public class PersistenceTests
             CoreSerializer.StoreToUri(element, uri);
             var json = JsonNode.Parse(File.ReadAllText(uri.LocalPath))!;
             JsonNode saved = json["Objects"]![0]!;
-            Assert.That(json["minAppVersion"]!.GetValue<string>(), Is.EqualTo("2.0.0-preview.11"));
+            Assert.That(json["minAppVersion"]!.GetValue<string>(), Is.EqualTo("2.0.0-preview.15"));
             Assert.That(saved["Lyrics"]!.AsArray().Select(line => line!.GetValue<string>()),
                 Is.EqualTo(new[] { "[00:00.000]<00:00.000>あいう<00:02.000>", "[00:02.500]つぎ", "[00:04.000]" }));
             Assert.That(saved["TimeOffset"]!.GetValue<long>(), Is.EqualTo(352800000L));
@@ -222,7 +222,7 @@ public class PersistenceTests
             CoreSerializer.StoreToUri(element, uri);
             var json = JsonNode.Parse(File.ReadAllText(uri.LocalPath))!;
             JsonNode saved = json["Objects"]![0]!;
-            Assert.That(json["minAppVersion"]!.GetValue<string>(), Is.EqualTo("2.0.0-preview.11"));
+            Assert.That(json["minAppVersion"]!.GetValue<string>(), Is.EqualTo("2.0.0-preview.15"));
             Assert.That(saved["Lyrics"]!.AsArray().Select(line => line!.GetValue<string>()), Is.EqualTo(lyrics));
             Assert.That(saved["TimeOffset"]!.GetValue<long>(), Is.EqualTo(176400000L));
             Assert.That(saved["SungStroke"]!["Thickness"]!.GetValue<float>(), Is.EqualTo(10f));

@@ -43,7 +43,7 @@ internal static class HeadlessScene
         EnsureAvailable();
         return RenderThread.Dispatcher.Invoke(() =>
         {
-            using var renderer = new SceneRenderer(scene, TestHost.Fonts, RenderIntent.Delivery);
+            using var renderer = new SceneRenderer(scene, new SceneRenderServices(TestHost.Fonts), RenderIntent.Delivery);
             CompositionFrame frame = renderer.Compositor.EvaluateGraphics(time);
             renderer.Render(frame);
             using Bitmap snapshot = renderer.Snapshot();

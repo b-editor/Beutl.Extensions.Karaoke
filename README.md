@@ -99,7 +99,7 @@
 
 ## 開発
 
-`Beutl.Extensibility.Sdk` 2.0.0-preview.15 と .NET 11 SDK でビルドします。
+`Beutl.Extensibility.Sdk` 2.0.0-preview.16 と .NET 11 SDK でビルドします。
 
 ```bash
 dotnet build src/Beutl.Extensions.Karaoke
