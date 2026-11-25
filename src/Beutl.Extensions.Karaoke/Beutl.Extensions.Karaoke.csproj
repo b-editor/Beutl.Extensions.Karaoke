@@ -1,12 +1,12 @@
-<Project Sdk="Beutl.Extensibility.Sdk/2.0.0-preview.15">
+<Project Sdk="Beutl.Extensibility.Sdk/2.0.0-preview.16">
 
     <PropertyGroup>
         <PackageId>Beutl.Extensions.Karaoke</PackageId>
         <Title>Karaoke subtitles</Title>
         <Description>Import LRC files and create karaoke subtitles that change color as the lyrics are sung.</Description>
         <PackageTags>caption,lyrics,karaoke,lrc,歌詞,カラオケ</PackageTags>
-        <Version>0.1.7</Version>
-        <AssemblyVersion>0.1.7.0</AssemblyVersion>
+        <Version>0.1.8</Version>
+        <AssemblyVersion>0.1.8.0</AssemblyVersion>
         <Authors>Yuto Terada</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>icon.png</PackageIcon>
@@ -19,7 +19,7 @@
             Include="Beutl.Engine.SourceGenerators"
             OutputItemType="Analyzer"
             ReferenceOutputAssembly="false"
-            Version="2.0.0-preview.15"
+            Version="2.0.0-preview.16"
             PrivateAssets="all" />
     </ItemGroup>
 
